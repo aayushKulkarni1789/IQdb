@@ -1,2 +1,5 @@
 photos/*
 rough*
+output/
+imgdb_chroma/
+__pycache__/
