@@ -3,3 +3,4 @@ rough*
 output/
 imgdb_chroma/
 __pycache__/
+uv.lock

@@ -3,7 +3,7 @@ name = "imgdb"
 version = "0.1.0"
 description = "Image query database using CLIP embeddings and ChromaDB"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "chromadb>=1.5.7",
     "numpy>=2.4.4",
