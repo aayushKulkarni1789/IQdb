@@ -1,13 +1,12 @@
 [project]
 name = "imgdb"
 version = "0.1.0"
-description = "Image query database using CLIP embeddings and ChromaDB"
+description = "Image query database"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "chromadb>=1.5.7",
-    "numpy>=2.4.4",
-    "pillow>=12.2.0",
-    "sentence-transformers>=5.4.0",
-    "tqdm>=4.67.3",
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "backend",
 ]
