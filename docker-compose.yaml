@@ -1,6 +1,8 @@
 services:
+
   db:
     build: ./database
+    restart: always
     ports:
       - '${POSTGRES_PORT}:5432'
     environment:
@@ -14,6 +16,23 @@ services:
       interval: 1m
       timeout: 10s
       retries: 3
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/utils/health-check/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
 volumes:
    postgres_data:

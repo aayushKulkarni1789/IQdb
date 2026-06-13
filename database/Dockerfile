@@ -15,4 +15,4 @@ RUN cd /tmp && \
     make && \
     make install
 
-EXPOSE 5000
+EXPOSE 5432
