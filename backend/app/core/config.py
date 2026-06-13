@@ -12,11 +12,11 @@ class Settings(BaseSettings):
     VERSION: str = "0.1.0"
     API_V1_STR: str = "/api/v1"
 
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str = "db" # db service used IF dockerized.
     POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "imgdb"
+    POSTGRES_DB: str
 
     @property
     def DATABASE_URL(self) -> str:
