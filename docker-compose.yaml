@@ -21,6 +21,10 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_HOST=db
     depends_on:
       db:
         condition: service_healthy
