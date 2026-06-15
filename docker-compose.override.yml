@@ -1,0 +1,13 @@
+services:
+  db:
+    restart: "no"
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+  backend:
+    restart: "no"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+    command: fastapi run --reload --host 0.0.0.0 --port 8000 app/main.py
