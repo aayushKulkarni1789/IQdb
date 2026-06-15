@@ -15,4 +15,6 @@ RUN cd /tmp && \
     make && \
     make install
 
+COPY init.sql /docker-entrypoint-initdb.d/
+
 EXPOSE 5432
