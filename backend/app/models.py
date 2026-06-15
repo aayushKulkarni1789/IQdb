@@ -58,10 +58,10 @@ class Image(ImageBase, table=True):
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),
     )
-    clip_embedding: "CLIPEmbedding | None" = Relationship(back_populates="image")
+    clip_embedding: "CLIP_Embedding | None" = Relationship(back_populates="image")
 
 
-class CLIPEmbedding(SQLModel, table=True):
+class CLIP_Embedding(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     image_id: int = Field(foreign_key="image.id", unique=True)
     embedding: Any = Field(sa_type=VECTOR(512))
