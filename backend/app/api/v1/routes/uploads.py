@@ -9,14 +9,14 @@ from app.crud import (
     create_upload_job,
     finalize_batch,
     get_upload_job_by_job_id,
+    mark_job_discarded,
     mark_job_uploaded,
     transition_to_uploading,
 )
 from app.models import (
     BatchUploadResponse,
-    CompleteUploadResponse,
+    UploadStatusChangeResponse,
     StartUploadRequest,
-    StartUploadResponse,
     UploadJobPublic,
     UploadJobStatus,
 )
@@ -31,13 +31,13 @@ router = APIRouter(prefix="/uploads", tags=["uploads"])
 
 
 # Start an upload
-@router.post("/start", response_model=StartUploadResponse)
+@router.post("/start", response_model=UploadStatusChangeResponse)
 def start_upload(
     body: StartUploadRequest,
     db: SessionDep,
-) -> StartUploadResponse:
+) -> UploadStatusChangeResponse:
     job = create_upload_job(db, body.expected_image_count)
-    return StartUploadResponse(job_id=job.job_id, status=job.status)
+    return UploadStatusChangeResponse(job_id=job.job_id, status=job.status)
 
 
 @router.get("/{job_id}", response_model=UploadJobPublic)
@@ -64,12 +64,16 @@ async def batch_upload(
     images: Annotated[
         list[UploadFile],
         File(),
-        WithJsonSchema({
-            "type": "array",
-            "items": {
-                "type": "string",
-                "format": "binary",
-            }})], # weird bug
+        WithJsonSchema(
+            {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "format": "binary",
+                },
+            }
+        ),
+    ],  # weird bug
     db: SessionDep,
 ) -> BatchUploadResponse:
     job = get_upload_job_by_job_id(db, job_id)
@@ -220,11 +224,11 @@ async def batch_upload(
     )
 
 
-@router.post("/{job_id}/complete", response_model=CompleteUploadResponse)
+@router.post("/{job_id}/complete", response_model=UploadStatusChangeResponse)
 def complete_upload(
     job_id: str,
     db: SessionDep,
-) -> CompleteUploadResponse:
+) -> UploadStatusChangeResponse:
     job = get_upload_job_by_job_id(db, job_id)
     if not job:
         logger.warning("Upload job not found: %s", job_id)
@@ -271,4 +275,39 @@ def complete_upload(
             detail="Upload job failed to transition to uploaded",
         )
 
-    return CompleteUploadResponse(job_id=job.job_id, status=job.status)
+    return UploadStatusChangeResponse(job_id=job.job_id, status=job.status)
+
+
+@router.post("/{job_id}/abort", response_model=UploadJobPublic)
+def abort_job(
+    job_id: str,
+    db: SessionDep,
+) -> UploadJobPublic:
+    job = get_upload_job_by_job_id(db, job_id)
+    if not job:
+        logger.warning("Upload job not found for abort: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+
+    if job.status == UploadJobStatus.DISCARD:
+        logger.warning(
+            "Upload job %s for abort already has the status: %s",
+            job_id,
+            job.status,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail="Upload job is already in the desired state",
+        )
+
+    job = mark_job_discarded(db, job_id)
+    if job is None:
+        logger.warning("Upload job not found after discard: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+
+    return UploadJobPublic(
+        job_id=job.job_id,
+        status=job.status,
+        expected_image_count=job.expected_image_count,
+        uploaded_count=job.uploaded_count,
+        created_at=job.created_at,
+    )

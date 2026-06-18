@@ -81,7 +81,27 @@ def mark_job_uploaded(
     if job is None:
         return None
     if result.rowcount == 0:
-        if job.status == UploadJobStatus.UPLOADED:
+        if job.status == UploadJobStatus.UPLOADED: # if it is already uploaded
+            return job
+        return None
+    return job
+
+
+def mark_job_discarded(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    result = db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id, UploadJob.status != UploadJobStatus.DISCARD)
+        .values(status=UploadJobStatus.DISCARD)
+    )
+    db.commit()
+    job = get_upload_job_by_job_id(db, job_id)
+    if job is None:
+        return None
+    if result.rowcount == 0:
+        if job.status == UploadJobStatus.DISCARD: # if it is already aborted/failed
             return job
         return None
     return job

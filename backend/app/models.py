@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Any, Optional
 
 from pgvector.sqlalchemy import VECTOR
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, String
 from sqlmodel import Field, Index, Relationship, SQLModel
 
 
@@ -18,6 +18,7 @@ class UploadJobStatus(StrEnum):
     OPEN = "open"
     UPLOADING = "uploading"
     UPLOADED = "uploaded"
+    DISCARD = "discard"
 
 
 # --- Base (shared fields) ---
@@ -63,19 +64,14 @@ class ImagesPublic(SQLModel):
     count: int
 
 
-class StartUploadResponse(SQLModel):
-    job_id: str
-    status: UploadJobStatus  # always OPEN when job is created
-
-
 class BatchUploadResponse(SQLModel):
     failed: int = Field(ge=0)
     uploaded_count: int = Field(ge=0)
 
 
-class CompleteUploadResponse(SQLModel):
+class UploadStatusChangeResponse(SQLModel):
     job_id: str
-    status: UploadJobStatus  # always UPLOADED after successful completion
+    status: UploadJobStatus
 
 
 class UploadJobPublic(SQLModel):
@@ -119,7 +115,7 @@ class CLIP_Embedding(SQLModel, table=True):
 class UploadJob(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     job_id: str = Field(unique=True, index=True)
-    status: UploadJobStatus = Field(default=UploadJobStatus.OPEN)
+    status: UploadJobStatus = Field(default=UploadJobStatus.OPEN, sa_type=String())
     expected_image_count: int = Field(ge=1)
     uploaded_count: int = Field(default=0, ge=0)
     created_at: datetime | None = Field(
