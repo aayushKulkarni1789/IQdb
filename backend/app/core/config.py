@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str
 
+    UPLOAD_ROOT: str = "/app/uploads"
+    MAX_BATCH_IMAGES: int = 50
+    MAX_IMAGE_SIZE_MB: int = 20
+
     @property
     def DATABASE_URL(self) -> str:
         return (

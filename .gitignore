@@ -5,3 +5,4 @@ imgdb_chroma/
 __pycache__/
 uv.lock
 .env
+uploads

@@ -29,6 +29,8 @@ services:
         restart: true
     env_file:
       - .env
+    volumes:
+      - uploads_data:/app/uploads
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/utils/health-check/')"]
       interval: 30s
@@ -38,3 +40,4 @@ services:
 
 volumes:
    postgres_data:
+   uploads_data:

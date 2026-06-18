@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
-from typing import Any
+from enum import StrEnum
+from typing import Any, Optional
 
 from pgvector.sqlalchemy import VECTOR
 from sqlalchemy import DateTime
@@ -10,12 +11,21 @@ def get_datetime_utc() -> datetime:
     return datetime.now(timezone.utc)
 
 
+# --- Enums ---
+
+
+class UploadJobStatus(StrEnum):
+    OPEN = "open"
+    UPLOADING = "uploading"
+    UPLOADED = "uploaded"
+
+
 # --- Base (shared fields) ---
 
 
 class ImageBase(SQLModel):
     filename: str
-    uri: str = Field(unique=True)
+    uri: str
     width: int | None = None
     height: int | None = None
     file_size: int | None = None
@@ -36,12 +46,16 @@ class ImageUpdate(SQLModel):
     file_size: int | None = None
 
 
+class StartUploadRequest(SQLModel):
+    expected_image_count: int = Field(ge=1)
+
+
 # --- API response schemas ---
 
 
 class ImagePublic(ImageBase):
     id: int
-    created_at: datetime | None = None
+    uploaded_at: datetime | None = None
 
 
 class ImagesPublic(SQLModel):
@@ -49,16 +63,40 @@ class ImagesPublic(SQLModel):
     count: int
 
 
-# --- Database table ---
+class StartUploadResponse(SQLModel):
+    job_id: str
+    status: UploadJobStatus  # always OPEN when job is created
+
+
+class BatchUploadResponse(SQLModel):
+    failed: int = Field(ge=0)
+    uploaded_count: int = Field(ge=0)
+
+
+class CompleteUploadResponse(SQLModel):
+    job_id: str
+    status: UploadJobStatus  # always UPLOADED after successful completion
+
+
+class UploadJobPublic(SQLModel):
+    job_id: str
+    status: UploadJobStatus
+    expected_image_count: int
+    uploaded_count: int
+    created_at: datetime | None = None
+
+
+# --- Database tables ---
 
 
 class Image(ImageBase, table=True):
+    uri: str = Field(unique=True)
     id: int | None = Field(default=None, primary_key=True)
-    created_at: datetime | None = Field(
+    uploaded_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),
     )
-    clip_embedding: "CLIP_Embedding | None" = Relationship(back_populates="image")
+    clip_embedding: Optional["CLIP_Embedding"] = Relationship(back_populates="image")
 
 
 class CLIP_Embedding(SQLModel, table=True):
@@ -75,4 +113,16 @@ class CLIP_Embedding(SQLModel, table=True):
             postgresql_with={"m": 16, "ef_construction": 64},
             postgresql_ops={"embedding": "vector_cosine_ops"},
         ),
+    )
+
+
+class UploadJob(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    job_id: str = Field(unique=True, index=True)
+    status: UploadJobStatus = Field(default=UploadJobStatus.OPEN)
+    expected_image_count: int = Field(ge=1)
+    uploaded_count: int = Field(default=0, ge=0)
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),
     )
