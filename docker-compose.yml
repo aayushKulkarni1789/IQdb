@@ -21,6 +21,9 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+      args:
+        CLIP_MODEL_NAME: ${CLIP_MODEL_NAME}
+        CLIP_MODEL_PATH: ${CLIP_PATH}
     environment:
       - POSTGRES_HOST=db
     depends_on:
@@ -39,5 +42,5 @@ services:
 
 
 volumes:
-   postgres_data:
-   uploads_data:
+  postgres_data:
+  uploads_data:
