@@ -23,6 +23,12 @@ dev = [
     "pytest>=8.0",
     "httpx>=0.27",
 ]
+model-setup = [
+    "pillow>=12.2.0",
+    "torch>=2.12.1",
+    "torchvision>=0.27.1",
+    "transformers>=5.12.1",
+]
 
 [build-system]
 requires = ["hatchling"]

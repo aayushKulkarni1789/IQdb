@@ -26,15 +26,19 @@ ENV PATH="/app/.venv/bin:$PATH"
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-workspace
+    --mount=type=bind,source=backend/pyproject.toml,target=pyproject.toml \
+    uv sync --package app --frozen --only-group model_setup
+
+COPY ./backend/scripts/install_model.py /app/backend/scripts/
+
+# Install CLIP Model
+ARG CLIP_MODEL_NAME
+ARG CLIP_MODEL_PATH
+RUN uv run /app/backend/scripts/install_model.py \
+    "${CLIP_MODEL_NAME}" \
+    "${CLIP_MODEL_PATH}"
 
 COPY ./backend/scripts /app/backend/scripts
-
-ARG CLIP_SENTENCE_TRANSFORMERS_STRING
-ARG CLIP_PATH
-RUN uv run /app/backend/scripts/install_model.py \
-    "${CLIP_SENTENCE_TRANSFORMERS_STRING}" \
-    "${CLIP_PATH}"
 
 COPY ./backend/pyproject.toml ./backend/alembic.ini /app/backend/
 
@@ -45,7 +49,7 @@ COPY ./backend/app /app/backend/app
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --package app
+    uv sync --frozen --package app --group model_setup
 
 WORKDIR /app/backend/
 

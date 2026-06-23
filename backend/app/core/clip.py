@@ -3,6 +3,7 @@ from transformers import CLIPModel, CLIPProcessor
 from app.core.config import settings
 
 def load_clip():
+    print(f"LOADING CLIP MDOEL: {settings.CLIP_MODEL_NAME} to {settings.CLIP_MODEL_PATH}")
     model = CLIPModel.from_pretrained(settings.CLIP_MODEL_PATH)
     processor = CLIPProcessor.from_pretrained(settings.CLIP_MODEL_PATH)
     model.eval()

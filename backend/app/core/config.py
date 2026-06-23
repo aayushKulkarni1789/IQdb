@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     MAX_BATCH_IMAGES: int = 50
     MAX_IMAGE_SIZE_MB: int = 20
 
+    CLIP_MODEL_NAME: str
     CLIP_MODEL_PATH: str
 
     @property

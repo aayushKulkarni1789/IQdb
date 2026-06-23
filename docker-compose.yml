@@ -23,7 +23,7 @@ services:
       dockerfile: backend/Dockerfile
       args:
         CLIP_MODEL_NAME: ${CLIP_MODEL_NAME}
-        CLIP_MODEL_PATH: ${CLIP_PATH}
+        CLIP_MODEL_PATH: ${CLIP_MODEL_PATH}
     environment:
       - POSTGRES_HOST=db
     depends_on:
