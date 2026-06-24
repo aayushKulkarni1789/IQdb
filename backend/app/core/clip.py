@@ -11,14 +11,14 @@ def load_clip():
 
 clip_model, clip_processor = load_clip()
 
-def get_text_embedding(text: str) -> list[float]:
-    inputs = clip_processor(text=[text], return_tensors="pt", padding=True)
+def get_text_embeddings(texts: list[str]) -> list[list[float]]:
+    inputs = clip_processor(text=texts, return_tensors="pt", padding=True)
     with torch.no_grad():
         outputs = clip_model.get_text_features(**inputs, return_dict=True)
-    return outputs.pooler_output[0].tolist()
+    return outputs.pooler_output.tolist()
 
-def get_image_embedding(image) -> list[float]:
+def get_image_embeddings(image: list) -> list[list[float]]:
     inputs = clip_processor(images=image, return_tensors="pt")
     with torch.no_grad():
         outputs = clip_model.get_image_features(**inputs, return_dict=True)
-    return outputs.pooler_output[0].tolist()
+    return outputs.pooler_output.tolist()
