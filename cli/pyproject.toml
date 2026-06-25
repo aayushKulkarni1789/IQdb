@@ -1,0 +1,20 @@
+[project]
+name = "cli"
+version = "0.1.0"
+description = "CLI package of the IMGDB project"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.25.1",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+imgdb-cli = "imgdb_cli.main:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
