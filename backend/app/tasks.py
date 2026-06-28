@@ -98,6 +98,8 @@ def process_upload_embeddings(job_id: str) -> None:
                     create_clip_embedding(db, image_id=image.id, embedding=embedding)
 
                 db.commit()
+                for img in pil_images:
+                    img.close()
                 logger.info("Job %s: batch %d/%d committed", job_id, batch_num, total_batches)
 
             mark_job_completed(db, job_id)
