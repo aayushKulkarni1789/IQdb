@@ -19,8 +19,9 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
 
     UPLOAD_ROOT: str = "/app/uploads"
-    MAX_BATCH_IMAGES: int = 50
-    MAX_IMAGE_SIZE_MB: int = 20
+    MAX_UPLOAD_BATCH_IMAGES: int
+    MAX_CLIP_BATCH_IMAGES: int
+    MAX_IMAGE_SIZE_MB: int
 
     CLIP_MODEL_NAME: str
     CLIP_MODEL_PATH: str

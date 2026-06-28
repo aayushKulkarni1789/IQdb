@@ -5,7 +5,7 @@ from sqlalchemy import update
 from sqlmodel import Session, select
 
 from app.core.config import settings
-from app.models import UploadJob, UploadJobStatus
+from app.models import CLIP_Embedding, Image, UploadJob, UploadJobStatus
 
 
 def create_upload_job(
@@ -81,7 +81,7 @@ def mark_job_uploaded(
     if job is None:
         return None
     if result.rowcount == 0:
-        if job.status == UploadJobStatus.UPLOADED: # if it is already uploaded
+        if job.status == UploadJobStatus.UPLOADED:  # if it is already uploaded
             return job
         return None
     return job
@@ -101,7 +101,83 @@ def mark_job_discarded(
     if job is None:
         return None
     if result.rowcount == 0:
-        if job.status == UploadJobStatus.DISCARD: # if it is already aborted/failed
+        if job.status == UploadJobStatus.DISCARD:  # if it is already aborted/failed
             return job
         return None
     return job
+
+
+def mark_job_processing(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    result = db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id, UploadJob.status == UploadJobStatus.UPLOADED)
+        .values(status=UploadJobStatus.PROCESSING)
+    )
+    db.commit()
+    job = get_upload_job_by_job_id(db, job_id)
+    if job is None:
+        return None
+    if result.rowcount == 0:
+        if job.status == UploadJobStatus.PROCESSING:
+            return job
+        return None
+    return job
+
+
+def mark_job_completed(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    result = db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id, UploadJob.status == UploadJobStatus.PROCESSING)
+        .values(status=UploadJobStatus.COMPLETED)
+    )
+    db.commit()
+    job = get_upload_job_by_job_id(db, job_id)
+    if job is None:
+        return None
+    if result.rowcount == 0:
+        if job.status == UploadJobStatus.COMPLETED:
+            return job
+        return None
+    return job
+
+
+def create_image(
+    db: Session,
+    filename: str,
+    uri: str,
+    width: int | None = None,
+    height: int | None = None,
+    file_size: int | None = None,
+) -> Image:
+    image = Image(
+        filename=filename,
+        uri=uri,
+        width=width,
+        height=height,
+        file_size=file_size,
+    )
+    db.add(image)
+    db.flush()
+    db.refresh(image)
+    return image
+
+
+def create_clip_embedding(
+    db: Session,
+    image_id: int,
+    embedding: list[float],
+) -> CLIP_Embedding:
+    clip_embedding = CLIP_Embedding(
+        image_id=image_id,
+        embedding=embedding,
+    )
+    db.add(clip_embedding)
+    db.flush()
+    db.refresh(clip_embedding)
+    return clip_embedding

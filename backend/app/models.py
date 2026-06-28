@@ -18,6 +18,8 @@ class UploadJobStatus(StrEnum):
     OPEN = "open"
     UPLOADING = "uploading"
     UPLOADED = "uploaded"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
     DISCARD = "discard"
 
 

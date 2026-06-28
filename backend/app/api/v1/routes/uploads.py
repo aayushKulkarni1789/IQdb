@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
 
 from app.api.deps import SessionDep
 from app.core.config import settings
@@ -20,6 +20,7 @@ from app.models import (
     UploadJobPublic,
     UploadJobStatus,
 )
+from app.tasks import process_upload_embeddings
 
 from typing import Annotated
 
@@ -108,16 +109,16 @@ async def batch_upload(
                 detail="Upload job failed to transition to uploading",
             )
 
-    if len(images) > settings.MAX_BATCH_IMAGES:
+    if len(images) > settings.MAX_UPLOAD_BATCH_IMAGES:
         logger.warning(
             "Upload job %s batch exceeds maximum of %s images (got %s)",
             job_id,
-            settings.MAX_BATCH_IMAGES,
+            settings.MAX_UPLOAD_BATCH_IMAGES,
             len(images),
         )
         raise HTTPException(
             status_code=400,
-            detail=f"Batch exceeds maximum of {settings.MAX_BATCH_IMAGES} images",
+            detail=f"Batch exceeds maximum of {settings.MAX_UPLOAD_BATCH_IMAGES} images",
         )
 
     if len(images) == 0:
@@ -226,8 +227,7 @@ async def batch_upload(
 
 @router.post("/{job_id}/complete", response_model=UploadStatusChangeResponse)
 def complete_upload(
-    job_id: str,
-    db: SessionDep,
+    job_id: str, db: SessionDep, background_task: BackgroundTasks
 ) -> UploadStatusChangeResponse:
     job = get_upload_job_by_job_id(db, job_id)
     if not job:
@@ -274,6 +274,8 @@ def complete_upload(
             status_code=409,
             detail="Upload job failed to transition to uploaded",
         )
+
+    background_task.add_task(process_upload_embeddings, job_id)
 
     return UploadStatusChangeResponse(job_id=job.job_id, status=job.status)
 

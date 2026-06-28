@@ -250,7 +250,7 @@ class TestLargeBatch:
         client: TestClient,
         tmp_upload_root: Path,
     ) -> None:
-        count = settings.MAX_BATCH_IMAGES
+        count = settings.MAX_UPLOAD_BATCH_IMAGES
         job_id = _create_job(client, expected_count=count)
         files = [_make_image_file(f"img_{i}.jpg") for i in range(count)]
         resp = _upload_batch(client, job_id, files)
