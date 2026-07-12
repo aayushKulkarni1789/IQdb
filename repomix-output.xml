@@ -1,0 +1,2829 @@
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: .opencode/**, .agents/**
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+backend/
+  app/
+    alembic/
+      versions/
+        2f1e59d630a2_changed_uploadjobstatus_to_string.py
+        5f6430c37e0d_initial_tables.py
+        bf3e83359345_added_upload_tables.py
+      __init__.py
+      env.py
+      script.py.mako
+    api/
+      v1/
+        routes/
+          __init__.py
+          uploads.py
+          utils.py
+        __init__.py
+        main.py
+      __init__.py
+      deps.py
+    core/
+      __init__.py
+      clip.py
+      config.py
+      db.py
+    __init__.py
+    backend_pre_start.py
+    crud.py
+    main.py
+    models.py
+    tasks.py
+  scripts/
+    install_model.py
+    prestart.sh
+  tests/
+    __init__.py
+    conftest.py
+    test_uploads.py
+  .dockerignore
+  alembic.ini
+  Dockerfile
+  pyproject.toml
+cli/
+  src/
+    imgdb_cli/
+      __init__.py
+      client.py
+      main.py
+  .env.example
+  pyproject.toml
+database/
+  Dockerfile
+  init.sql
+openspec/
+  schemas/
+    intent-driven/
+      templates/
+        adr.md
+        design.md
+        proposal.md
+        spec.md
+        tasks.md
+      README.md
+      schema.yaml
+  config.yaml
+.env.example
+.gitignore
+.python-version
+AGENTS.md
+docker-compose.override.yml
+docker-compose.yml
+Makefile
+opencode.json
+pyproject.toml
+README.md
+skills-lock.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="openspec/schemas/intent-driven/templates/adr.md">
+# ADR Review Manifest
+
+- Status: completed
+- Review date: YYYY-MM-DD
+
+## Review Summary
+
+ADR review completed for this change.
+
+## In-Force ADRs Reviewed
+
+<!-- Replace with every currently in-force repository-level ADR reviewed for this change. -->
+
+- None - `<repo>/adr/` has no in-force ADRs.
+
+## New Durable ADRs Created
+
+<!-- Replace with every repository-level ADR created for this change. Do not duplicate full Context, Decision, or Consequences content here. -->
+
+- None - no major durable architectural decisions were introduced.
+</file>
+
+<file path="openspec/schemas/intent-driven/templates/design.md">
+## Context
+
+<!-- Background and current state -->
+
+## Goals / Non-Goals
+
+**Goals:**
+<!-- What this design aims to achieve -->
+
+**Non-Goals:**
+<!-- What is explicitly out of scope -->
+
+## Decisions
+
+<!-- Key design decisions and rationale -->
+
+## Risks / Trade-offs
+
+<!-- Known risks and trade-offs -->
+
+## Migration Plan
+
+<!-- Deployment, migration, and rollback notes if applicable -->
+
+## Open Questions
+
+<!-- Outstanding decisions, including any in-force ADRs that need supersession -->
+</file>
+
+<file path="openspec/schemas/intent-driven/templates/proposal.md">
+## Why
+
+<!-- Explain the motivation for this change. What problem does this solve? Why now? -->
+
+## What Changes
+
+<!-- Describe what will change. Be specific about new capabilities, modifications, or removals. -->
+
+## Capabilities
+
+### New Capabilities
+<!-- Capabilities being introduced. Replace <name> with kebab-case identifier (e.g., user-auth, data-export, api-rate-limiting). Each creates specs/<name>/spec.md with OpenSpec delta headers and Gherkin-style scenarios. -->
+- `<name>`: <brief description of what this capability covers>
+
+### Modified Capabilities
+<!-- Existing capabilities whose behaviour is changing (not just implementation).
+     Only list here if spec-level behaviour changes. Each needs a delta spec.md file.
+     Use existing spec names from openspec/specs/. Leave empty if no requirement changes. -->
+- `<existing-name>`: <what behaviour is changing>
+
+## Impact
+
+<!-- Affected code, APIs, dependencies, systems -->
+</file>
+
+<file path="openspec/schemas/intent-driven/templates/spec.md">
+## ADDED Requirements
+
+### Requirement: <!-- feature or business rule name -->
+<!-- Optional Gherkin-style context, for example:
+Feature: <capability>
+Rule: <business rule>
+-->
+
+#### Scenario: <!-- scenario name -->
+- **GIVEN** <!-- starting context -->
+- **WHEN** <!-- action or event -->
+- **THEN** <!-- observable outcome -->
+
+## MODIFIED Requirements
+
+<!-- Copy the full existing requirement block from openspec/specs/<capability>/spec.md, then edit it so it represents the full desired behaviour after the change. -->
+
+## REMOVED Requirements
+
+### Requirement: <!-- removed feature or business rule name -->
+**Reason**: <!-- why this behaviour is removed -->
+
+**Migration**: <!-- how users or systems should adapt -->
+</file>
+
+<file path="openspec/schemas/intent-driven/templates/tasks.md">
+## 1. <!-- Task Group Name -->
+
+- [ ] 1.1 <!-- Task description -->
+- [ ] 1.2 <!-- Task description -->
+
+## 2. <!-- Task Group Name -->
+
+- [ ] 2.1 <!-- Task description -->
+- [ ] 2.2 <!-- Task description -->
+</file>
+
+<file path="openspec/schemas/intent-driven/README.md">
+# Intent-Driven OpenSpec Schema
+
+`intent-driven` is a proposal-to-tasks workflow for changes where contributor
+intent, observable behaviour, technical design, and durable architectural
+decisions should all be captured before implementation.
+
+It keeps specs mergeable by default OpenSpec archive by generating
+`specs/<capability>/spec.md` files. The Markdown headings are the OpenSpec
+wrapper; the content inside each requirement and scenario should be written in
+Gherkin style with `GIVEN`, `WHEN`, and `THEN` steps.
+
+- Good fit: product or platform changes with meaningful behaviour and
+  long-lived design decisions, cross-module work, or architecture choices that
+  future changes should honor.
+- Not a good fit: small tactical fixes, docs-only changes, dependency bumps, or
+  behaviour-only work where `behaviour-driven` is enough.
+
+## Activate
+
+Set this in `openspec/config.yaml`:
+
+```yaml
+schema: intent-driven
+```
+
+## Stage Gates
+
+Artifact order:
+
+```text
+proposal -> specs -> design -> adr -> tasks
+```
+
+Gate expectations:
+
+- `proposal` states why the change matters and lists the capabilities that need
+  behaviour specs.
+- `specs` creates one OpenSpec Markdown delta file per capability at
+  `specs/<capability>/spec.md`.
+- `design` explains the implementation approach and accounts for currently
+  in-force ADRs.
+- `adr` writes the per-change ADR review manifest at
+  `openspec/changes/<change>/adr.md` after design and before task planning.
+  Durable repository-level ADR files are created only when the change
+  introduces a major architectural decision that should persist beyond the
+  change.
+- `tasks` are planned only after proposal, specs, design, and ADR artifacts are
+  complete.
+
+## Spec Format
+
+Use OpenSpec Markdown delta headers so archive can merge the change:
+
+```md
+## ADDED Requirements
+
+### Requirement: User data export
+Feature: User data export
+
+Rule: Users can export their own data
+
+#### Scenario: Successful CSV export
+- **GIVEN** a user has saved data
+- **WHEN** the user exports their data as CSV
+- **THEN** the system provides a CSV file containing the user's data
+```
+
+Do not create `.feature` files for this schema. External Gherkin linting can be
+run by the target project, but the schema package intentionally does not include
+Gherkin lint configuration.
+
+## ADR Persistence
+
+The `adr` artifact completion signal is the change-local review manifest at
+`openspec/changes/<change>/adr.md`. Existing files under the repository-level
+`adr/` folder are context for a new change; they are not completion evidence
+for that change.
+
+Durable ADR files are generated under the target repository's top-level `adr/`
+folder only when the change introduces a major architectural decision that
+should persist beyond the change. They are not written inside the OpenSpec
+change folder. Accepted ADRs are immutable. If a future decision changes a
+prior ADR, create a new ADR that supersedes the old one and leave the original
+file unchanged.
+
+## Validate
+
+```bash
+openspec schema validate intent-driven
+```
+
+For more schemas, refer to https://github.com/intent-driven-dev/openspec-schemas.
+</file>
+
+<file path="openspec/schemas/intent-driven/schema.yaml">
+name: intent-driven
+version: 1
+description: Intent-driven OpenSpec workflow - proposal -> Gherkin-style specs -> design -> adr -> tasks
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: Initial proposal document outlining the change
+    template: proposal.md
+    instruction: >
+      Create the proposal document that establishes WHY this change is needed.
+
+
+      Sections:
+
+      - **Why**: 1-2 sentences on the problem or opportunity. What problem does
+      this solve? Why now?
+
+      - **What Changes**: Bullet list of changes. Be specific about new
+      capabilities, modifications, or removals. Mark breaking changes with
+      **BREAKING**.
+
+      - **Capabilities**: Identify which behaviour specs will be created or modified:
+        - **New Capabilities**: List capabilities being introduced. Each becomes a new `specs/<name>/spec.md`. Use kebab-case names (e.g., `user-auth`, `data-export`).
+        - **Modified Capabilities**: List existing capabilities whose behaviour is changing. Only include if spec-level behaviour changes, not just implementation details. Each needs an OpenSpec Markdown delta file at `specs/<name>/spec.md`. Check `openspec/specs/` for existing spec names. Leave empty if no behaviour changes.
+      - **Impact**: Affected code, APIs, dependencies, or systems.
+
+
+      IMPORTANT: The Capabilities section is critical. It creates the contract
+      between proposal and specs phases. Research existing specs before filling
+      this in. Each capability listed here will need a corresponding spec file.
+
+
+      Durable architectural decisions worth carrying across changes are
+      distilled into ADR files at <repo>/adr/ by a later step after design.
+
+
+      Keep it concise (1-2 pages). Focus on the "why" not the "how" -
+      implementation details belong in design.md.
+
+
+      This is the foundation - specs, design, adr, and tasks all build on this.
+    requires: []
+  - id: specs
+    generates: specs/**/*.md
+    description: OpenSpec Markdown specs with Gherkin-style behaviour scenarios
+    template: spec.md
+    instruction: >
+      Create OpenSpec Markdown spec files that define WHAT the system should do.
+      The Markdown structure is the OpenSpec merge wrapper; the requirement and
+      scenario content inside that wrapper should be written in Gherkin style.
+
+
+      Create one spec file per capability listed in the proposal's Capabilities
+      section.
+
+      - New capabilities: use the exact kebab-case name from the proposal
+      (specs/<capability>/spec.md).
+
+      - Modified capabilities: use the existing spec folder name from
+      openspec/specs/<capability>/ when creating the delta spec at
+      specs/<capability>/spec.md.
+
+
+      Delta operations (use ## headers exactly so OpenSpec archive can merge):
+
+      - **ADDED Requirements**: New behaviour capabilities.
+
+      - **MODIFIED Requirements**: Changed behaviour - MUST include the full
+      updated requirement content, not a partial diff.
+
+      - **REMOVED Requirements**: Deprecated behaviours - MUST include
+      **Reason** and **Migration**.
+
+      - **RENAMED Requirements**: Name changes only - use FROM:/TO: format.
+
+
+      OpenSpec wrapper requirements:
+
+      - Each requirement MUST use `### Requirement: <name>`.
+
+      - Each scenario MUST use `#### Scenario: <name>`. This exact four-hash
+      heading is required for OpenSpec validation and archive.
+
+      - Every requirement MUST have at least one scenario.
+
+
+      Gherkin-style content requirements:
+
+      - Treat each requirement as the feature or business rule being specified.
+      You may include `Feature:` or `Rule:` prose in the requirement body when
+      it clarifies the behaviour.
+
+      - Each scenario MUST describe behaviour with `GIVEN`, `WHEN`, and `THEN`
+      steps. Use `AND` or `BUT` for follow-on steps.
+
+      - Write observable outcomes in `THEN` steps. Avoid implementation details
+      such as database table names, private methods, or UI selectors unless
+      they are part of the domain contract.
+
+      - Do not create `.feature` files for this artifact. External Gherkin
+      linting is outside this schema; `spec.md` is required for OpenSpec merge.
+
+
+      MODIFIED requirements workflow:
+
+      1. Locate the existing requirement in openspec/specs/<capability>/spec.md.
+
+      2. Copy the ENTIRE requirement block (from `### Requirement:` through all
+      scenarios).
+
+      3. Paste under `## MODIFIED Requirements` and edit it so the copied block
+      represents the full desired behaviour after the change.
+
+      4. Ensure header text matches exactly (whitespace-insensitive).
+
+
+      Common pitfall: Using MODIFIED with partial content loses detail at
+      archive time. If adding new concerns without changing existing behaviour,
+      use ADDED instead.
+    requires:
+      - proposal
+  - id: design
+    generates: design.md
+    description: Technical design document with implementation details
+    template: design.md
+    instruction: >
+      Create the design document that explains HOW to implement the change.
+
+
+      When to include design.md (create only if any apply):
+
+      - Cross-cutting change (multiple services/modules) or new architectural
+      pattern
+
+      - New external dependency or significant data model changes
+
+      - Security, performance, or migration complexity
+
+      - Ambiguity that benefits from technical decisions before coding
+
+
+      Prior decisions (read existing ADRs first):
+
+      Before writing, list every file in <repo>/adr/. Build the supersession
+      graph from each ADR's Supersedes field - an ADR is no longer in force if
+      a later ADR's Supersedes points at it. Only the currently-in-force ADRs
+      (accepted, not superseded) constrain this design. Older superseded ADRs
+      are historical context only and MUST NOT be treated as live commitments.
+      New design choices MUST be coherent with the in-force set. If a current
+      ADR needs to be revisited, do not propose modifying it; flag it under
+      Open Questions and let the adr step record a new superseding ADR.
+
+
+      Sections:
+
+      - **Context**: Background, current state, constraints, stakeholders
+
+      - **Goals / Non-Goals**: What this design achieves and explicitly excludes
+
+      - **Decisions**: Key technical choices with rationale (why X over Y?).
+      Include alternatives considered for each decision.
+
+      - **Risks / Trade-offs**: Known limitations, things that could go wrong.
+      Format: [Risk] -> Mitigation
+
+      - **Migration Plan**: Steps to deploy, rollback strategy (if applicable)
+
+      - **Open Questions**: Outstanding decisions or unknowns to resolve.
+      Include any in-force ADRs that this design suggests revisiting; the adr
+      step will record the supersession.
+
+
+      Focus on architecture and approach, not line-by-line implementation.
+
+      Reference the proposal for motivation and specs for requirements.
+
+
+      Good design docs explain the "why" behind technical decisions.
+    requires:
+      - proposal
+  - id: adr
+    generates: adr.md
+    description: Per-change ADR review manifest and durable decision handoff
+    template: adr.md
+    instruction: >
+      Complete ADR review for this change by writing a concise manifest at
+      openspec/changes/<change>/adr.md. This change-local file is the artifact
+      completion marker for the adr step. Existing files under <repo>/adr/ are
+      required context for the review, but they MUST NOT satisfy completion for
+      a new change.
+
+
+      If the change introduces a major durable architectural decision, also
+      create an Architecture Decision Record under <repo>/adr/. The path
+      <repo>/adr/ means the target repository's top-level adr/ folder beside
+      openspec/, not any folder inside openspec/. Repository-level ADR files
+      persist across changes and MUST be written outside openspec/.
+
+
+      IRON RULE - ADRs are immutable once accepted. You MUST NOT edit a prior
+      ADR file under any circumstance, not its Status, not its body, not its
+      date. To change a previously accepted decision, record a NEW ADR whose
+      Status is "accepted, supersedes ADR-NNNN" and whose `Supersedes:` field
+      names the prior one. Design consumers derive what is currently in force
+      by walking Supersedes links across the folder. The prior ADR's contents
+      stay frozen as a historical record.
+
+
+      Process:
+
+      1. Read every existing ADR in <repo>/adr/. Build the supersession graph
+      from each ADR's Supersedes field. Note the highest sequence number in
+      use.
+
+      2. Re-read design.md. Identify decisions that meet ALL of these:
+
+      - Establish a long-term architectural commitment (pattern, technology,
+      boundary, contract) - not a tactical implementation detail.
+
+      - Will affect future changes beyond this one.
+
+      - Either aren't already captured by a currently-in-force ADR, OR
+      intentionally diverge from one. If diverging, the new ADR supersedes the
+      prior.
+
+      3. For each qualifying decision, create a NEW repository-level file at
+      <repo>/adr/NNNN-kebab-title.md, where NNNN is a 4-digit sequence one
+      greater than the highest existing. Include title, Status, Date, optional
+      Supersedes, and MADR-short sections: Context, Decision, and
+      Consequences. If this decision replaces a prior in-force ADR, set Status to
+      "accepted, supersedes ADR-NNNN", populate the `Supersedes:` field, and
+      explain in Context why the prior decision is being revisited. Do NOT
+      touch the prior ADR's file.
+
+      4. Write openspec/changes/<change>/adr.md using the template. The
+      manifest MUST state that ADR review completed for this change, list the
+      in-force ADR context reviewed, and reference every repository-level ADR
+      file created for this change. It MUST NOT duplicate full Context,
+      Decision, or Consequences content from repository-level ADR files.
+
+      5. If nothing meets the bar, do not invent ADRs. The manifest MUST
+      explicitly state that no major durable architectural decisions were
+      introduced and no new repository-level ADR files were created.
+
+
+      Filename convention: NNNN-kebab-title.md (e.g.,
+      0042-use-postgres-for-catalog.md). Sequence is monotonic across the
+      whole repo and never reused.
+    requires:
+      - design
+  - id: tasks
+    generates: tasks.md
+    description: Implementation checklist with trackable tasks
+    template: tasks.md
+    instruction: >
+      Create the task list that breaks down the implementation work.
+
+
+      **IMPORTANT: Follow the template below exactly.** The apply phase parses
+      checkbox format to track progress. Tasks not using `- [ ]` won't be
+      tracked.
+
+
+      Guidelines:
+
+      - Group related tasks under ## numbered headings.
+
+      - Each task MUST be a checkbox: `- [ ] X.Y Task description`.
+
+      - Tasks should be small enough to complete in one session.
+
+      - Order tasks by dependency (what must be done first?).
+
+      - If implementation changes behaviour specs, include a task to run
+      `openspec validate <change> --type change --strict` before archive.
+
+
+      Reference specs for what to build, design for how to build it, and
+      <repo>/adr/ for durable architectural commitments to honor.
+
+      Each task should be verifiable - you know when it's done.
+    requires:
+      - specs
+      - adr
+apply:
+  requires:
+    - tasks
+  tracks: tasks.md
+  instruction: |
+    Read context files, work through pending tasks, mark complete as you go.
+    Pause if you hit blockers or need clarification.
+</file>
+
+<file path="openspec/config.yaml">
+schema: intent-driven
+
+#   context: |
+#     Tech stack: TypeScript, React, Node.js
+#     We use conventional commits
+#     Domain: e-commerce platform
+
+rules:
+  proposal:
+    - Must use grill-me skill
+  design:
+    - Must use c4-diagrams skill
+  adr:
+    - Must use architectural-decision-records skill
+  spec:
+    - Must use gherkin-authoring skill
+</file>
+
+<file path="AGENTS.md">
+# AGENTS.md
+
+- For OpenSpec propose/apply/verify/archive workflows, use the local `openspec-git-discipline` skill to enforce proposal commits before apply and merge-before-archive discipline.
+</file>
+
+<file path="opencode.json">
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"]
+}
+</file>
+
+<file path="skills-lock.json">
+{
+  "version": 1,
+  "skills": {
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "computedHash": "784f0dbb7403b0f00324bce9a112f715342777a0daee7bbb7385f9c6f0a170ea"
+    }
+  }
+}
+</file>
+
+<file path="backend/app/alembic/versions/2f1e59d630a2_changed_uploadjobstatus_to_string.py">
+"""changed uploadjobstatus to string
+
+Revision ID: 2f1e59d630a2
+Revises: bf3e83359345
+Create Date: 2026-06-18 18:01:34.412402
+
+"""
+from alembic import op
+import sqlalchemy as sa
+import sqlmodel.sql.sqltypes
+import pgvector.sqlalchemy
+from sqlalchemy.dialects import postgresql
+
+# revision identifiers, used by Alembic.
+revision = '2f1e59d630a2'
+down_revision = 'bf3e83359345'
+branch_labels = None
+depends_on = None
+
+
+def upgrade():
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.create_table('uploadjob',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('job_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('status', sa.String(), nullable=False),
+    sa.Column('expected_image_count', sa.Integer(), nullable=False),
+    sa.Column('uploaded_count', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_uploadjob_job_id'), 'uploadjob', ['job_id'], unique=True)
+    op.add_column('image', sa.Column('uploaded_at', sa.DateTime(timezone=True), nullable=True))
+    op.drop_column('image', 'created_at')
+    # ### end Alembic commands ###
+
+
+def downgrade():
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.add_column('image', sa.Column('created_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True))
+    op.drop_column('image', 'uploaded_at')
+    op.drop_index(op.f('ix_uploadjob_job_id'), table_name='uploadjob')
+    op.drop_table('uploadjob')
+    # ### end Alembic commands ###
+</file>
+
+<file path="backend/app/alembic/versions/5f6430c37e0d_initial_tables.py">
+"""initial tables
+
+Revision ID: 5f6430c37e0d
+Revises: 
+Create Date: 2026-06-15 19:12:45.730039
+
+"""
+from alembic import op
+import sqlalchemy as sa
+import sqlmodel.sql.sqltypes
+import pgvector.sqlalchemy
+
+
+# revision identifiers, used by Alembic.
+revision = '5f6430c37e0d'
+down_revision = None
+branch_labels = None
+depends_on = None
+
+
+def upgrade():
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.create_table('image',
+    sa.Column('filename', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('uri', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('width', sa.Integer(), nullable=True),
+    sa.Column('height', sa.Integer(), nullable=True),
+    sa.Column('file_size', sa.Integer(), nullable=True),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('uri')
+    )
+    op.create_table('clip_embedding',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('image_id', sa.Integer(), nullable=False),
+    sa.Column('embedding', pgvector.sqlalchemy.vector.VECTOR(dim=512), nullable=False),
+    sa.ForeignKeyConstraint(['image_id'], ['image.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('image_id')
+    )
+    op.create_index('ix_clip_embedding_hnsw', 'clip_embedding', ['embedding'], unique=False, postgresql_using='hnsw', postgresql_with={'m': 16, 'ef_construction': 64}, postgresql_ops={'embedding': 'vector_cosine_ops'})
+    # ### end Alembic commands ###
+
+
+def downgrade():
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_index('ix_clip_embedding_hnsw', table_name='clip_embedding', postgresql_using='hnsw', postgresql_with={'m': 16, 'ef_construction': 64}, postgresql_ops={'embedding': 'vector_cosine_ops'})
+    op.drop_table('clip_embedding')
+    op.drop_table('image')
+    # ### end Alembic commands ###
+</file>
+
+<file path="backend/app/alembic/versions/bf3e83359345_added_upload_tables.py">
+"""added upload tables
+
+Revision ID: bf3e83359345
+Revises: 5f6430c37e0d
+Create Date: 2026-06-18 06:04:52.026622
+
+"""
+from alembic import op
+import sqlalchemy as sa
+import sqlmodel.sql.sqltypes
+import pgvector.sqlalchemy
+from sqlalchemy.dialects import postgresql
+
+# revision identifiers, used by Alembic.
+revision = 'bf3e83359345'
+down_revision = '5f6430c37e0d'
+branch_labels = None
+depends_on = None
+
+
+def upgrade():
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.create_table('uploadjob',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('job_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('status', sa.Enum('OPEN', 'UPLOADING', 'UPLOADED', name='uploadjobstatus'), nullable=False),
+    sa.Column('expected_image_count', sa.Integer(), nullable=False),
+    sa.Column('uploaded_count', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_uploadjob_job_id'), 'uploadjob', ['job_id'], unique=True)
+    op.add_column('image', sa.Column('uploaded_at', sa.DateTime(timezone=True), nullable=True))
+    op.drop_column('image', 'created_at')
+    # ### end Alembic commands ###
+
+
+def downgrade():
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.add_column('image', sa.Column('created_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True))
+    op.drop_column('image', 'uploaded_at')
+    op.drop_index(op.f('ix_uploadjob_job_id'), table_name='uploadjob')
+    op.drop_table('uploadjob')
+    # ### end Alembic commands ###
+</file>
+
+<file path="backend/app/alembic/__init__.py">
+
+</file>
+
+<file path="backend/app/api/v1/routes/__init__.py">
+
+</file>
+
+<file path="backend/app/api/__init__.py">
+
+</file>
+
+<file path="backend/app/api/deps.py">
+from collections.abc import Generator
+from typing import Annotated
+
+from fastapi import Depends
+from sqlmodel import Session
+
+from app.core.db import engine
+
+
+def get_db() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_db)]
+</file>
+
+<file path="backend/app/core/__init__.py">
+
+</file>
+
+<file path="backend/app/__init__.py">
+
+</file>
+
+<file path="backend/app/backend_pre_start.py">
+import logging
+
+from sqlalchemy import Engine
+from sqlmodel import Session, select
+from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
+
+from app.core.db import engine
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+max_tries = 60 * 5  # 5 minutes
+wait_seconds = 1
+
+
+@retry(
+    stop=stop_after_attempt(max_tries),
+    wait=wait_fixed(wait_seconds),
+    before=before_log(logger, logging.INFO),
+    after=after_log(logger, logging.WARN),
+)
+def init(db_engine: Engine) -> None:
+    try:
+        with Session(db_engine) as session:
+            # Try to create session to check if DB is awake
+            session.exec(select(1))
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+
+def main() -> None:
+    logger.info("Initializing service")
+    init(engine)
+    logger.info("Service finished initializing")
+
+
+if __name__ == "__main__":
+    main()
+</file>
+
+<file path="backend/scripts/prestart.sh">
+#! /usr/bin/env bash
+
+set -e
+set -x
+
+# Let the DB start
+python app/backend_pre_start.py
+
+# Run migrations
+alembic upgrade head
+</file>
+
+<file path="backend/tests/__init__.py">
+
+</file>
+
+<file path="backend/tests/conftest.py">
+import shutil
+import tempfile
+from collections.abc import Generator
+from pathlib import Path
+
+import pytest
+from fastapi.testclient import TestClient
+from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel.pool import StaticPool
+
+from app.core.config import settings
+from app.main import app
+
+
+@pytest.fixture(name="db_engine")
+def db_engine() -> Generator:
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    SQLModel.metadata.create_all(engine)
+    yield engine
+    SQLModel.metadata.drop_all(engine)
+
+
+@pytest.fixture(name="db_session")
+def db_session(db_engine) -> Generator:
+    with Session(db_engine) as session:
+        yield session
+
+
+@pytest.fixture(name="client")
+def client(db_session: Session) -> Generator:
+    from app.api.deps import get_db
+
+    def _get_db_override() -> Generator:
+        yield db_session
+
+    app.dependency_overrides[get_db] = _get_db_override
+    with TestClient(app) as c:
+        yield c
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture(name="tmp_upload_root")
+def tmp_upload_root() -> Generator:
+    tmp_dir = Path(tempfile.mkdtemp())
+    original = settings.UPLOAD_ROOT
+    settings.UPLOAD_ROOT = str(tmp_dir)
+    yield tmp_dir
+    settings.UPLOAD_ROOT = original
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+@pytest.fixture(name="sample_image_bytes")
+def sample_image_bytes() -> bytes:
+    # Minimal valid JPEG: 1x1 white pixel
+    return (
+        b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00"
+        b"\xff\xdb\x00C\x00\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07\t\t"
+        b"\x08\n\x0c\x14\r\x0c\x0b\x0b\x0c\x19\x12\x13\x0f\x14\x1d\x1a"
+        b"\x1f\x1e\x1d\x1a\x1c\x1c $.\x27 \",#\x1c\x1c(7),01444\x1f'9=82<.342"
+        b"\xff\xc0\x00\x0b\x08\x00\x01\x00\x01\x01\x01\x11\x00"
+        b"\xff\xc4\x00\x1f\x00\x00\x01\x05\x01\x01\x01\x01\x01\x01\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b"
+        b"\xff\xda\x00\x08\x01\x01\x00\x00?\x00T\xdb\x9e\x97\xfa\xce"
+        b"\xff\xd9"
+    )
+</file>
+
+<file path="backend/.dockerignore">
+# Python
+__pycache__
+app.egg-info
+*.pyc
+.mypy_cache
+.coverage
+htmlcov
+.venv
+</file>
+
+<file path="backend/alembic.ini">
+# A generic, single database configuration.
+
+[alembic]
+# path to migration scripts
+script_location = app/alembic
+
+# template used to generate migration files
+# file_template = %%(rev)s_%%(slug)s
+
+# timezone to use when rendering the date
+# within the migration file as well as the filename.
+# string value is passed to dateutil.tz.gettz()
+# leave blank for localtime
+# timezone =
+
+# max length of characters to apply to the
+# "slug" field
+#truncate_slug_length = 40
+
+# set to 'true' to run the environment during
+# the 'revision' command, regardless of autogenerate
+# revision_environment = false
+
+# set to 'true' to allow .pyc and .pyo files without
+# a source .py file to be detected as revisions in
+# the versions/ directory
+# sourceless = false
+
+# version location specification; this defaults
+# to alembic/versions.  When using multiple version
+# directories, initial revisions must be specified with --version-path
+# version_locations = %(here)s/bar %(here)s/bat alembic/versions
+
+# the output encoding used when revision files
+# are written from script.py.mako
+# output_encoding = utf-8
+
+# Logging configuration
+[loggers]
+keys = root,sqlalchemy,alembic
+
+[handlers]
+keys = console
+
+[formatters]
+keys = generic
+
+[logger_root]
+level = WARN
+handlers = console
+qualname =
+
+[logger_sqlalchemy]
+level = WARN
+handlers =
+qualname = sqlalchemy.engine
+
+[logger_alembic]
+level = INFO
+handlers =
+qualname = alembic
+
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+
+[formatter_generic]
+format = %(levelname)-5.5s [%(name)s] %(message)s
+datefmt = %H:%M:%S
+</file>
+
+<file path="cli/src/imgdb_cli/__init__.py">
+
+</file>
+
+<file path="cli/src/imgdb_cli/client.py">
+from pathlib import Path
+
+import requests
+
+
+class ImgDbClient:
+    def __init__(self, base_url: str) -> None:
+        self.base_url = base_url.rstrip("/")
+        self._session = requests.Session()
+
+    def create_session(self, expected_count: int) -> tuple[str, str]:
+        resp = self._session.post(
+            f"{self.base_url}/api/v1/uploads/start",
+            json={"expected_image_count": expected_count},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["job_id"], data["status"]
+
+    def upload_batch(self, job_id: str, files: list[Path]) -> dict:
+        upload_files = []
+        for f in files:
+            upload_files.append(("images", (f.name, f.read_bytes(), _guess_mime(f))))
+        resp = self._session.post(
+            f"{self.base_url}/api/v1/uploads/{job_id}/batch",
+            files=upload_files,
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+    def get_status(self, job_id: str) -> dict:
+        resp = self._session.get(f"{self.base_url}/api/v1/uploads/{job_id}")
+        resp.raise_for_status()
+        return resp.json()
+
+    def complete(self, job_id: str) -> dict:
+        resp = self._session.post(f"{self.base_url}/api/v1/uploads/{job_id}/complete")
+        resp.raise_for_status()
+        return resp.json()
+
+
+def _guess_mime(path: Path) -> str:
+    ext = path.suffix.lower()
+    return {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".gif": "image/gif",
+        ".webp": "image/webp",
+        ".bmp": "image/bmp",
+        ".tiff": "image/tiff",
+        ".tif": "image/tiff",
+    }.get(ext, "application/octet-stream")
+</file>
+
+<file path="cli/src/imgdb_cli/main.py">
+from pathlib import Path
+
+import typer
+from dotenv import load_dotenv
+
+from .client import ImgDbClient
+
+load_dotenv()
+
+app = typer.Typer(help="IMGDB CLI")
+
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".tiff", ".tif"}
+
+
+@app.command()
+def upload(
+    directory: Path = typer.Argument(
+        ...,
+        help="Directory containing images to upload",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        resolve_path=True,
+    ),
+    batch_size: int = typer.Option(
+        10,
+        "--batch-size",
+        "-b",
+        help="Number of images per batch",
+        min=1,
+        max=50,
+    ),
+    backend_url: str = typer.Option(
+        "http://localhost:8000",
+        "--backend-url",
+        "-u",
+        help="Backend API base URL",
+        envvar="BACKEND_URL",
+    ),
+) -> None:
+    image_files = sorted(
+        f for f in directory.iterdir() if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS
+    )
+
+    if not image_files:
+        typer.echo("No image files found in directory", err=True)
+        raise typer.Exit(1)
+
+    typer.echo(f"Found {len(image_files)} images to upload")
+
+    client = ImgDbClient(backend_url)
+
+    job_id, status = client.create_session(len(image_files))
+    typer.echo(f"Session created: {job_id} (status: {status})")
+
+    for i in range(0, len(image_files), batch_size):
+        batch = image_files[i : i + batch_size]
+        batch_num = i // batch_size + 1
+        typer.echo(f"Uploading batch {batch_num} ({len(batch)} images)...")
+        result = client.upload_batch(job_id, batch)
+        typer.echo(f"  Uploaded: {result['uploaded_count']}, Failed: {result['failed']}")
+
+    typer.echo("Verifying upload status...")
+    info = client.get_status(job_id)
+    typer.echo(
+        f"  Status: {info['status']}, "
+        f"Uploaded: {info['uploaded_count']}/{info['expected_image_count']}"
+    )
+
+    if info["uploaded_count"] != info["expected_image_count"]:
+        typer.echo("Upload count mismatch — not completing session", err=True)
+        raise typer.Exit(1)
+
+    result = client.complete(job_id)
+    typer.echo(f"Session completed: {result['status']}")
+
+
+@app.callback(invoke_without_command=True)
+def callback():
+    pass
+
+
+def main():
+    app()
+</file>
+
+<file path="cli/.env.example">
+BACKEND_URL="https://localhost"
+BACKEND_PORT=8000
+</file>
+
+<file path="cli/pyproject.toml">
+[project]
+name = "cli"
+version = "0.1.0"
+description = "CLI package of the IMGDB project"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.25.1",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+imgdb-cli = "imgdb_cli.main:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+</file>
+
+<file path="database/init.sql">
+CREATE EXTENSION IF NOT EXISTS vector;
+</file>
+
+<file path="Makefile">
+.PHONY: migrate upgrade db
+
+migrate:
+	docker compose exec backend alembic revision --autogenerate -m "$(msg)"
+
+upgrade:
+	docker compose exec backend alembic upgrade head
+
+db:
+	docker compose exec db psql -U root -d imagedb
+</file>
+
+<file path="README.md">
+
+</file>
+
+<file path="backend/app/alembic/script.py.mako">
+"""${message}
+
+Revision ID: ${up_revision}
+Revises: ${down_revision | comma,n}
+Create Date: ${create_date}
+
+"""
+from alembic import op
+import sqlalchemy as sa
+import sqlmodel.sql.sqltypes
+import pgvector.sqlalchemy
+${imports if imports else ""}
+
+# revision identifiers, used by Alembic.
+revision = ${repr(up_revision)}
+down_revision = ${repr(down_revision)}
+branch_labels = ${repr(branch_labels)}
+depends_on = ${repr(depends_on)}
+
+
+def upgrade():
+    ${upgrades if upgrades else "pass"}
+
+
+def downgrade():
+    ${downgrades if downgrades else "pass"}
+</file>
+
+<file path="backend/app/api/v1/__init__.py">
+
+</file>
+
+<file path="backend/app/api/v1/main.py">
+from fastapi import APIRouter
+
+from app.api.v1.routes import uploads, utils
+
+api_router = APIRouter()
+api_router.include_router(utils.router)
+api_router.include_router(uploads.router)
+</file>
+
+<file path="backend/app/core/db.py">
+from sqlmodel import create_engine
+
+from app.core.config import settings
+
+engine = create_engine(str(settings.DATABASE_URL))
+</file>
+
+<file path="backend/app/main.py">
+from fastapi import FastAPI
+
+from app.api.v1.main import api_router
+from app.core.config import settings
+
+app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION)
+app.include_router(api_router, prefix=settings.API_V1_STR)
+</file>
+
+<file path="backend/app/tasks.py">
+import logging
+from pathlib import Path
+
+from PIL import Image as PILImage
+from sqlmodel import Session
+
+from app.core.clip import get_image_embeddings
+from app.core.config import settings
+from app.core.db import engine
+from app.crud import (
+    create_clip_embedding,
+    create_image,
+    mark_job_completed,
+    mark_job_discarded,
+    mark_job_processing,
+)
+
+logger = logging.getLogger(__name__)
+
+
+def process_upload_embeddings(job_id: str) -> None:
+    logger.info("Starting CLIP embedding ingestion for job %s", job_id)
+    images_dir = Path(settings.UPLOAD_ROOT) / job_id / "images"
+
+    if not images_dir.is_dir():
+        logger.error("Images directory not found for job %s: %s", job_id, images_dir)
+        return
+
+    # NOTE: It is sorted to provide resumability (is that what it's called?)
+    image_files = sorted(
+        p
+        for p in images_dir.iterdir()
+        if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"}
+    )
+    if not image_files:
+        logger.warning("No image files found for job %s", job_id)
+        return
+
+    total = len(image_files)
+    batch_size = settings.MAX_CLIP_BATCH_IMAGES
+    logger.info("Job %s: %d images to process in batches of %d", job_id, total, batch_size)
+
+    try:
+        # create a new db session
+        with Session(engine) as db:
+            job = mark_job_processing(db, job_id)
+            if job is None:
+                logger.error(
+                    "Job %s: failed to transition from UPLOADED to PROCESSING, aborting", job_id
+                )
+                return
+
+            for start in range(0, total, batch_size):
+                batch_files = image_files[start : start + batch_size]
+                batch_num = start // batch_size + 1
+                total_batches = (total + batch_size - 1) // batch_size
+                logger.info(
+                    "Job %s: processing batch %d/%d (%d images)",
+                    job_id,
+                    batch_num,
+                    total_batches,
+                    len(batch_files),
+                )
+
+                pil_images = []
+                for f in batch_files:
+                    try:
+                        pil_images.append(PILImage.open(f))
+                    except Exception:
+                        logger.exception(
+                            "Job %s: failed to open image %s, skipping", job_id, f.name
+                        )
+
+                if not pil_images:
+                    continue
+
+                # Batch process images for getting embeddings
+                embeddings = get_image_embeddings(pil_images)
+
+                # Prepare the table row for Image & CLIP_Embedding table
+                for f, embedding in zip(batch_files, embeddings):
+                    file_size = f.stat().st_size
+                    try:
+                        with PILImage.open(f) as img:
+                            width, height = img.size
+                    except Exception:
+                        width, height = None, None
+
+                    uri = f"{job_id}/images/{f.name}"
+                    image = create_image(
+                        db,
+                        filename=f.name,
+                        uri=uri,
+                        width=width,
+                        height=height,
+                        file_size=file_size,
+                    )
+                    create_clip_embedding(db, image_id=image.id, embedding=embedding)
+
+                db.commit()
+                for img in pil_images:
+                    img.close()
+                logger.info("Job %s: batch %d/%d committed", job_id, batch_num, total_batches)
+
+            mark_job_completed(db, job_id)
+            logger.info("CLIP embedding ingestion complete for job %s (%d images)", job_id, total)
+
+    except Exception:
+        logger.exception("Job %s: processing failed unexpectedly", job_id)
+        try:
+            with Session(engine) as db:
+                mark_job_discarded(db, job_id)
+        except Exception:
+            logger.exception("Job %s: failed to mark job as discarded after error", job_id)
+</file>
+
+<file path="backend/scripts/install_model.py">
+import argparse
+from pathlib import Path
+from transformers import CLIPProcessor, CLIPModel, CLIPImageProcessor, CLIPTokenizer
+
+parser = argparse.ArgumentParser()
+parser.add_argument("model_name")
+parser.add_argument("save_path", type=Path)
+args = parser.parse_args()
+
+print(f"Downloading {args.model_name} to {args.save_path}")
+
+model = CLIPModel.from_pretrained(args.model_name)
+model.save_pretrained(args.save_path)
+
+tokenizer = CLIPTokenizer.from_pretrained(args.model_name)
+image_processor = CLIPImageProcessor.from_pretrained(args.model_name)
+
+processor = CLIPProcessor(image_processor=image_processor, tokenizer=tokenizer)
+processor.save_pretrained(args.save_path)
+
+print("Done.")
+</file>
+
+<file path="backend/tests/test_uploads.py">
+from io import BytesIO
+from pathlib import Path
+
+import pytest
+from fastapi.testclient import TestClient
+from sqlmodel import Session
+
+from app.core.config import settings
+
+
+def _create_job(client: TestClient, expected_count: int = 3) -> str:
+    resp = client.post(
+        "/api/v1/start_upload",
+        json={"expected_image_count": expected_count},
+    )
+    assert resp.status_code == 201
+    return resp.json()["job_id"]
+
+
+def _upload_batch(
+    client: TestClient,
+    job_id: str,
+    files: list[tuple[str, bytes, str]],
+) -> dict:
+    return client.post(
+        f"/api/v1/uploads/{job_id}/batch",
+        files=files,
+    )
+
+
+def _make_image_file(
+    name: str = "test.jpg",
+    content_type: str = "image/jpeg",
+    data: bytes | None = None,
+) -> tuple[str, BytesIO, str]:
+    if data is None:
+        data = b"\xff\xd8\xff" + b"\x00" * 100
+    return (name, BytesIO(data), content_type)
+
+
+# --- Start Upload ---
+
+
+class TestStartUpload:
+    def test_start_upload(self, client: TestClient, tmp_upload_root: Path) -> None:
+        resp = client.post(
+            "/api/v1/start_upload",
+            json={"expected_image_count": 10},
+        )
+        assert resp.status_code == 201
+        body = resp.json()
+        assert "job_id" in body
+        assert body["status"] == "OK"
+
+        job_dir = tmp_upload_root / body["job_id"]
+        assert job_dir.exists()
+        assert (job_dir / "images").exists()
+
+    def test_start_upload_rejects_zero_count(self, client: TestClient) -> None:
+        resp = client.post(
+            "/api/v1/start_upload",
+            json={"expected_image_count": 0},
+        )
+        assert resp.status_code == 422
+
+
+# --- Get Status ---
+
+
+class TestGetStatus:
+    def test_get_status(self, client: TestClient, tmp_upload_root: Path) -> None:
+        job_id = _create_job(client)
+        resp = client.get(f"/api/v1/uploads/{job_id}")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["job_id"] == job_id
+        assert body["status"] == "open"
+        assert body["expected_image_count"] == 3
+        assert body["uploaded_count"] == 0
+        assert "created_at" in body
+
+    def test_get_status_404(self, client: TestClient) -> None:
+        resp = client.get("/api/v1/uploads/nonexistent")
+        assert resp.status_code == 404
+
+
+# --- Batch Upload ---
+
+
+class TestBatchUpload:
+    def test_batch_single_image(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=1)
+        files = [_make_image_file("photo.jpg")]
+        resp = _upload_batch(client, job_id, files)
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["failed"] == 0
+        assert body["uploaded_count"] == 1
+
+        images_dir = tmp_upload_root / job_id / "images"
+        saved = list(images_dir.iterdir())
+        assert len(saved) == 1
+        assert saved[0].name == "001_photo.jpg"
+
+    def test_batch_multiple_images(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=3)
+        files = [
+            _make_image_file("a.jpg"),
+            _make_image_file("b.png", "image/png"),
+            _make_image_file("c.jpg"),
+        ]
+        resp = _upload_batch(client, job_id, files)
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["failed"] == 0
+        assert body["uploaded_count"] == 3
+
+        images_dir = tmp_upload_root / job_id / "images"
+        saved = sorted(images_dir.iterdir())
+        assert [f.name for f in saved] == ["001_a.jpg", "002_b.png", "003_c.jpg"]
+
+    def test_batch_rejects_non_image(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client)
+        files = [("file.txt", BytesIO(b"not an image"), "text/plain")]
+        resp = _upload_batch(client, job_id, files)
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["failed"] == 1
+        assert body["uploaded_count"] == 0
+
+    def test_batch_404_nonexistent_job(self, client: TestClient) -> None:
+        files = [_make_image_file("photo.jpg")]
+        resp = _upload_batch(client, "nonexistent", files)
+        assert resp.status_code == 404
+
+    def test_batch_rejects_finalized_job(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=1)
+        files = [_make_image_file("photo.jpg")]
+        _upload_batch(client, job_id, files)
+        client.post(f"/api/v1/uploads/{job_id}/complete")
+
+        resp = _upload_batch(client, job_id, [_make_image_file("extra.jpg")])
+        assert resp.status_code == 400
+
+    def test_first_batch_transitions_to_uploading(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=1)
+        resp = client.get(f"/api/v1/uploads/{job_id}")
+        assert resp.json()["status"] == "open"
+
+        _upload_batch(client, job_id, [_make_image_file("a.jpg")])
+
+        resp = client.get(f"/api/v1/uploads/{job_id}")
+        assert resp.json()["status"] == "uploading"
+
+
+# --- Resume Upload ---
+
+
+class TestResumeUpload:
+    def test_resume_upload(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=4)
+
+        _upload_batch(client, job_id, [_make_image_file("a.jpg")])
+        _upload_batch(client, job_id, [_make_image_file("b.jpg")])
+
+        resp = client.get(f"/api/v1/uploads/{job_id}")
+        body = resp.json()
+        assert body["uploaded_count"] == 2
+        assert body["status"] == "uploading"
+
+        images_dir = tmp_upload_root / job_id / "images"
+        saved = sorted(images_dir.iterdir())
+        assert [f.name for f in saved] == ["001_a.jpg", "002_b.jpg"]
+
+
+# --- Complete Upload ---
+
+
+class TestCompleteUpload:
+    def test_complete_upload(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=2)
+        _upload_batch(
+            client,
+            job_id,
+            [_make_image_file("a.jpg"), _make_image_file("b.jpg")],
+        )
+        resp = client.post(f"/api/v1/uploads/{job_id}/complete")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["job_id"] == job_id
+        assert body["status"] == "OK"
+
+        resp = client.get(f"/api/v1/uploads/{job_id}")
+        assert resp.json()["status"] == "uploaded"
+
+    def test_complete_rejects_count_mismatch(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=5)
+        _upload_batch(client, job_id, [_make_image_file("a.jpg")])
+        resp = client.post(f"/api/v1/uploads/{job_id}/complete")
+        assert resp.status_code == 400
+
+    def test_complete_rejects_open_job(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=1)
+        resp = client.post(f"/api/v1/uploads/{job_id}/complete")
+        assert resp.status_code == 400
+
+
+# --- Large Batch ---
+
+
+class TestLargeBatch:
+    def test_large_batch(
+        self,
+        client: TestClient,
+        tmp_upload_root: Path,
+    ) -> None:
+        count = settings.MAX_UPLOAD_BATCH_IMAGES
+        job_id = _create_job(client, expected_count=count)
+        files = [_make_image_file(f"img_{i}.jpg") for i in range(count)]
+        resp = _upload_batch(client, job_id, files)
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["failed"] == 0
+        assert body["uploaded_count"] == count
+</file>
+
+<file path=".python-version">
+3.12
+</file>
+
+<file path="docker-compose.override.yml">
+services:
+  db:
+    restart: "no"
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+  backend:
+    restart: "no"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./uploads:/app/uploads
+    command: fastapi run --reload --host 0.0.0.0 --port 8000 app/main.py
+</file>
+
+<file path="backend/app/alembic/env.py">
+import os
+from logging.config import fileConfig
+
+from alembic import context
+from sqlalchemy import engine_from_config, pool
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+assert config.config_file_name is not None
+fileConfig(config.config_file_name)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+# target_metadata = None
+
+from app.models import SQLModel  # noqa
+from app.core.config import settings  # noqa
+
+target_metadata = SQLModel.metadata
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+
+def get_url():
+    return str(settings.DATABASE_URL)
+
+
+def run_migrations_offline():
+    """Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well.  By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+
+    """
+    url = get_url()
+    context.configure(
+        url=url, target_metadata=target_metadata, literal_binds=True, compare_type=True
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online():
+    """Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+
+    """
+    configuration = config.get_section(config.config_ini_section)
+    assert configuration is not None
+    configuration["sqlalchemy.url"] = get_url()
+    connectable = engine_from_config(
+        configuration,
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
+</file>
+
+<file path="backend/app/api/v1/routes/uploads.py">
+import logging
+from pathlib import Path
+
+from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
+
+from app.api.deps import SessionDep
+from app.core.config import settings
+from app.crud import (
+    create_upload_job,
+    finalize_batch,
+    get_upload_job_by_job_id,
+    mark_job_discarded,
+    mark_job_uploaded,
+    transition_to_uploading,
+)
+from app.models import (
+    BatchUploadResponse,
+    UploadStatusChangeResponse,
+    StartUploadRequest,
+    UploadJobPublic,
+    UploadJobStatus,
+)
+from app.tasks import process_upload_embeddings
+
+from typing import Annotated
+
+from pydantic.json_schema import WithJsonSchema
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/uploads", tags=["uploads"])
+
+
+# Start an upload
+@router.post("/start", response_model=UploadStatusChangeResponse)
+def start_upload(
+    body: StartUploadRequest,
+    db: SessionDep,
+) -> UploadStatusChangeResponse:
+    job = create_upload_job(db, body.expected_image_count)
+    return UploadStatusChangeResponse(job_id=job.job_id, status=job.status)
+
+
+@router.get("/{job_id}", response_model=UploadJobPublic)
+def get_upload_status(
+    job_id: str,
+    db: SessionDep,
+) -> UploadJobPublic:
+    job = get_upload_job_by_job_id(db, job_id)
+    if not job:
+        logger.warning("Upload job not found: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+    return UploadJobPublic(
+        job_id=job.job_id,
+        status=job.status,
+        expected_image_count=job.expected_image_count,
+        uploaded_count=job.uploaded_count,
+        created_at=job.created_at,
+    )
+
+
+@router.post("/{job_id}/batch", response_model=BatchUploadResponse)
+async def batch_upload(
+    job_id: str,
+    images: Annotated[
+        list[UploadFile],
+        File(),
+        WithJsonSchema(
+            {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "format": "binary",
+                },
+            }
+        ),
+    ],  # weird bug
+    db: SessionDep,
+) -> BatchUploadResponse:
+    job = get_upload_job_by_job_id(db, job_id)
+    if not job:
+        logger.warning("Upload job not found: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+
+    if job.status not in {UploadJobStatus.OPEN, UploadJobStatus.UPLOADING}:
+        logger.warning(
+            "Upload job %s in invalid state for batch upload: %s",
+            job_id,
+            job.status,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail=f"Upload job is in invalid state: {job.status}",
+        )
+
+    if job.status == UploadJobStatus.OPEN:
+        job = transition_to_uploading(db, job_id)
+        if job is None:
+            logger.warning("Upload job not found after transition: %s", job_id)
+            raise HTTPException(status_code=404, detail="Upload job not found")
+        if job.status != UploadJobStatus.UPLOADING:
+            logger.warning(
+                "Upload job %s failed to transition to uploading, status=%s",
+                job_id,
+                job.status,
+            )
+            raise HTTPException(
+                status_code=409,
+                detail="Upload job failed to transition to uploading",
+            )
+
+    if len(images) > settings.MAX_UPLOAD_BATCH_IMAGES:
+        logger.warning(
+            "Upload job %s batch exceeds maximum of %s images (got %s)",
+            job_id,
+            settings.MAX_UPLOAD_BATCH_IMAGES,
+            len(images),
+        )
+        raise HTTPException(
+            status_code=400,
+            detail=f"Batch exceeds maximum of {settings.MAX_UPLOAD_BATCH_IMAGES} images",
+        )
+
+    if len(images) == 0:
+        logger.warning("Upload job %s received empty batch", job_id)
+        raise HTTPException(
+            status_code=400,
+            detail="Batch must contain at least one image",
+        )
+
+    if job.uploaded_count + len(images) > job.expected_image_count:
+        logger.warning(
+            "Upload job %s batch would exceed expected count: "
+            "uploaded=%s, attempted=%s, expected=%s",
+            job_id,
+            job.uploaded_count,
+            len(images),
+            job.expected_image_count,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Batch would exceed expected image count: "
+                f"uploaded_count={job.uploaded_count}, "
+                f"attempted={len(images)}, "
+                f"expected_image_count={job.expected_image_count}"
+            ),
+        )
+
+    images_dir = Path(settings.UPLOAD_ROOT) / job_id / "images"
+    max_size_bytes = settings.MAX_IMAGE_SIZE_MB * 1024 * 1024
+    resolved_images_dir = images_dir.resolve()
+
+    success_count = 0
+    failed_count = 0
+    next_seq = job.uploaded_count + 1
+
+    for i, file in enumerate(images):
+        if not file.content_type or not file.content_type.startswith("image/"):
+            logger.warning(
+                "Upload job %s file %s: rejected content_type=%r",
+                job_id,
+                i,
+                file.content_type,
+            )
+            failed_count += 1
+            continue
+
+        safe_name = Path(file.filename or "upload").name
+        if safe_name in {"", ".", ".."}:
+            logger.warning(
+                "Upload job %s file %s: invalid filename %r",
+                job_id,
+                i,
+                file.filename,
+            )
+            failed_count += 1
+            continue
+
+        filename = f"{next_seq + i:03d}_{safe_name}"
+        dest_path = images_dir / filename
+
+        if not dest_path.resolve().is_relative_to(resolved_images_dir):
+            logger.warning(
+                "Upload job %s file %s: path escapes upload directory: %r",
+                job_id,
+                i,
+                file.filename,
+            )
+            failed_count += 1
+            continue
+
+        try:
+            content = await file.read()
+            if len(content) > max_size_bytes:
+                logger.warning(
+                    "Upload job %s file %s (%s): exceeds %sMB limit",
+                    job_id,
+                    i,
+                    safe_name,
+                    settings.MAX_IMAGE_SIZE_MB,
+                )
+                failed_count += 1
+                continue
+            dest_path.write_bytes(content)
+            success_count += 1
+        except Exception:
+            dest_path.unlink(missing_ok=True)
+            logger.exception(
+                "Upload job %s file %s (%s): failed to save",
+                job_id,
+                i,
+                safe_name,
+            )
+            failed_count += 1
+
+    job = finalize_batch(db, job_id, success_count)
+    if job is None:
+        logger.warning("Upload job not found after finalize_batch: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+
+    return BatchUploadResponse(
+        failed=failed_count,
+        uploaded_count=job.uploaded_count,
+    )
+
+
+@router.post("/{job_id}/complete", response_model=UploadStatusChangeResponse)
+def complete_upload(
+    job_id: str, db: SessionDep, background_task: BackgroundTasks
+) -> UploadStatusChangeResponse:
+    job = get_upload_job_by_job_id(db, job_id)
+    if not job:
+        logger.warning("Upload job not found: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+
+    if job.status != UploadJobStatus.UPLOADING:
+        logger.warning(
+            "Upload job %s complete rejected: not in uploading state (status=%s)",
+            job_id,
+            job.status,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail="Upload job is not in uploading state",
+        )
+
+    if job.uploaded_count != job.expected_image_count:
+        logger.warning(
+            "Upload job %s complete rejected: uploaded_count=%s, expected=%s",
+            job_id,
+            job.uploaded_count,
+            job.expected_image_count,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"uploaded_count ({job.uploaded_count}) does not match "
+                f"expected_image_count ({job.expected_image_count})"
+            ),
+        )
+
+    job = mark_job_uploaded(db, job_id)
+    if job is None:
+        logger.warning("Upload job not found after mark_job_uploaded: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+    if job.status != UploadJobStatus.UPLOADED:
+        logger.warning(
+            "Upload job %s failed to transition to uploaded, status=%s",
+            job_id,
+            job.status,
+        )
+        raise HTTPException(
+            status_code=409,
+            detail="Upload job failed to transition to uploaded",
+        )
+
+    background_task.add_task(process_upload_embeddings, job_id)
+
+    return UploadStatusChangeResponse(job_id=job.job_id, status=job.status)
+
+
+@router.post("/{job_id}/abort", response_model=UploadJobPublic)
+def abort_job(
+    job_id: str,
+    db: SessionDep,
+) -> UploadJobPublic:
+    job = get_upload_job_by_job_id(db, job_id)
+    if not job:
+        logger.warning("Upload job not found for abort: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+
+    if job.status == UploadJobStatus.DISCARD:
+        logger.warning(
+            "Upload job %s for abort already has the status: %s",
+            job_id,
+            job.status,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail="Upload job is already in the desired state",
+        )
+
+    job = mark_job_discarded(db, job_id)
+    if job is None:
+        logger.warning("Upload job not found after discard: %s", job_id)
+        raise HTTPException(status_code=404, detail="Upload job not found")
+
+    return UploadJobPublic(
+        job_id=job.job_id,
+        status=job.status,
+        expected_image_count=job.expected_image_count,
+        uploaded_count=job.uploaded_count,
+        created_at=job.created_at,
+    )
+</file>
+
+<file path="backend/app/api/v1/routes/utils.py">
+from fastapi import APIRouter, UploadFile, File
+from pydantic import BaseModel
+from pydantic.json_schema import WithJsonSchema
+from PIL import Image
+from typing import List, Annotated
+import io
+
+from app.core.clip import get_text_embeddings, get_image_embeddings
+
+router = APIRouter(prefix="/utils", tags=["utils"])
+
+
+class TextInput(BaseModel):
+    text: str
+
+
+@router.get("/health-check/")
+def health_check() -> bool:
+    return True
+
+
+@router.post("/embed-text/")
+def embed_text(texts: List[str]):
+    embeddings = get_text_embeddings(texts)
+    return {"embeddings": embeddings}
+
+Annotated[
+        list[UploadFile],
+        File(),
+        WithJsonSchema(
+            {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "format": "binary",
+                },
+            }
+        ),
+    ]
+@router.post("/embed-image/")
+async def embed_image(
+    files: Annotated[
+        list[UploadFile],
+        File(),
+        WithJsonSchema(
+            {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "format": "binary",
+                },
+            }
+        ),
+    ]
+):
+    images = []
+    for file in files:
+        contents = await file.read()
+        images.append(Image.open(io.BytesIO(contents)))
+    embeddings = get_image_embeddings(images)
+    return {"embeddings": embeddings}
+</file>
+
+<file path="backend/app/core/clip.py">
+import torch
+from transformers import CLIPModel, CLIPProcessor
+from app.core.config import settings
+
+def load_clip():
+    print(f"LOADING CLIP MDOEL: {settings.CLIP_MODEL_NAME} to {settings.CLIP_MODEL_PATH}")
+    model = CLIPModel.from_pretrained(settings.CLIP_MODEL_PATH)
+    processor = CLIPProcessor.from_pretrained(settings.CLIP_MODEL_PATH)
+    model.eval()
+    return model, processor
+
+clip_model, clip_processor = load_clip()
+
+def get_text_embeddings(texts: list[str]) -> list[list[float]]:
+    inputs = clip_processor(text=texts, return_tensors="pt", padding=True)
+    with torch.no_grad():
+        outputs = clip_model.get_text_features(**inputs, return_dict=True)
+    return outputs.pooler_output.tolist()
+
+def get_image_embeddings(image: list) -> list[list[float]]:
+    inputs = clip_processor(images=image, return_tensors="pt")
+    with torch.no_grad():
+        outputs = clip_model.get_image_features(**inputs, return_dict=True)
+    return outputs.pooler_output.tolist()
+</file>
+
+<file path="backend/app/crud.py">
+import uuid
+from pathlib import Path
+
+from sqlalchemy import update
+from sqlmodel import Session, select
+
+from app.core.config import settings
+from app.models import CLIP_Embedding, Image, UploadJob, UploadJobStatus
+
+
+def create_upload_job(
+    db: Session,
+    expected_image_count: int,
+) -> UploadJob:
+    job_id = uuid.uuid4().hex
+    upload_dir = Path(settings.UPLOAD_ROOT) / job_id / "images"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    job = UploadJob(
+        job_id=job_id,
+        expected_image_count=expected_image_count,
+    )
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    return job
+
+
+def get_upload_job_by_job_id(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    return db.exec(select(UploadJob).where(UploadJob.job_id == job_id)).first()
+
+
+def finalize_batch(
+    db: Session,
+    job_id: str,
+    success_count: int,
+) -> UploadJob | None:
+    db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id)
+        .values(uploaded_count=UploadJob.uploaded_count + success_count)
+    )
+    db.commit()
+    return get_upload_job_by_job_id(db, job_id)
+
+
+def transition_to_uploading(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    result = db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id, UploadJob.status == UploadJobStatus.OPEN)
+        .values(status=UploadJobStatus.UPLOADING)
+    )
+    db.commit()
+    job = get_upload_job_by_job_id(db, job_id)
+    if job is None:
+        return None
+    if result.rowcount == 0:
+        if job.status == UploadJobStatus.UPLOADING:
+            return job
+        return None
+    return job
+
+
+def mark_job_uploaded(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    result = db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id, UploadJob.status == UploadJobStatus.UPLOADING)
+        .values(status=UploadJobStatus.UPLOADED)
+    )
+    db.commit()
+    job = get_upload_job_by_job_id(db, job_id)
+    if job is None:
+        return None
+    if result.rowcount == 0:
+        if job.status == UploadJobStatus.UPLOADED:  # if it is already uploaded
+            return job
+        return None
+    return job
+
+
+def mark_job_discarded(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    result = db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id, UploadJob.status != UploadJobStatus.DISCARD)
+        .values(status=UploadJobStatus.DISCARD)
+    )
+    db.commit()
+    job = get_upload_job_by_job_id(db, job_id)
+    if job is None:
+        return None
+    if result.rowcount == 0:
+        if job.status == UploadJobStatus.DISCARD:  # if it is already aborted/failed
+            return job
+        return None
+    return job
+
+
+def mark_job_processing(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    result = db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id, UploadJob.status == UploadJobStatus.UPLOADED)
+        .values(status=UploadJobStatus.PROCESSING)
+    )
+    db.commit()
+    job = get_upload_job_by_job_id(db, job_id)
+    if job is None:
+        return None
+    if result.rowcount == 0:
+        if job.status == UploadJobStatus.PROCESSING:
+            return job
+        return None
+    return job
+
+
+def mark_job_completed(
+    db: Session,
+    job_id: str,
+) -> UploadJob | None:
+    result = db.exec(
+        update(UploadJob)
+        .where(UploadJob.job_id == job_id, UploadJob.status == UploadJobStatus.PROCESSING)
+        .values(status=UploadJobStatus.COMPLETED)
+    )
+    db.commit()
+    job = get_upload_job_by_job_id(db, job_id)
+    if job is None:
+        return None
+    if result.rowcount == 0:
+        if job.status == UploadJobStatus.COMPLETED:
+            return job
+        return None
+    return job
+
+
+def create_image(
+    db: Session,
+    filename: str,
+    uri: str,
+    width: int | None = None,
+    height: int | None = None,
+    file_size: int | None = None,
+) -> Image:
+    image = Image(
+        filename=filename,
+        uri=uri,
+        width=width,
+        height=height,
+        file_size=file_size,
+    )
+    db.add(image)
+    db.flush()
+    db.refresh(image)
+    return image
+
+
+def create_clip_embedding(
+    db: Session,
+    image_id: int,
+    embedding: list[float],
+) -> CLIP_Embedding:
+    clip_embedding = CLIP_Embedding(
+        image_id=image_id,
+        embedding=embedding,
+    )
+    db.add(clip_embedding)
+    db.flush()
+    db.refresh(clip_embedding)
+    return clip_embedding
+</file>
+
+<file path="backend/Dockerfile">
+FROM python:3.12-slim-trixie
+
+# Disable Python buffering
+ENV PYTHONUNBUFFERED=1
+
+# Install uv
+# Ref: https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.26 /uv /uvx /bin/
+
+# Compile bytecode
+# Ref: https://docs.astral.sh/uv/guides/integration/docker/#compiling-bytecode
+ENV UV_COMPILE_BYTECODE=1
+
+# uv Cache
+# Ref: https://docs.astral.sh/uv/guides/integration/docker/#caching
+ENV UV_LINK_MODE=copy
+
+WORKDIR /app/
+
+# Place executables in the environment at the front of the path
+# Ref: https://docs.astral.sh/uv/guides/integration/docker/#using-the-environment
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Install dependencies
+# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=backend/pyproject.toml,target=pyproject.toml \
+    uv sync --package app --frozen --only-group model_setup
+
+COPY ./backend/scripts/install_model.py /app/backend/scripts/
+
+# Install CLIP Model
+ARG CLIP_MODEL_NAME
+ARG CLIP_MODEL_PATH
+RUN uv run /app/backend/scripts/install_model.py \
+    "${CLIP_MODEL_NAME}" \
+    "${CLIP_MODEL_PATH}"
+
+COPY ./backend/scripts /app/backend/scripts
+
+COPY ./backend/pyproject.toml ./backend/alembic.ini /app/backend/
+
+COPY ./backend/app /app/backend/app
+
+# Sync the project
+# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --package app --group model_setup
+
+WORKDIR /app/backend/
+
+CMD ["bash", "-c", "python app/backend_pre_start.py && alembic upgrade head && fastapi run app/main.py"]
+</file>
+
+<file path="database/Dockerfile">
+FROM postgres:18
+
+WORKDIR /app
+
+# Install build dependancies
+RUN apt-get update && apt-get install -y \
+git \
+build-essential \
+postgresql-server-dev-18
+
+# Install pgvector
+RUN cd /tmp && \
+    git clone --branch v0.8.2 https://github.com/pgvector/pgvector.git && \
+    cd pgvector && \
+    make && \
+    make install
+
+COPY init.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 5432
+</file>
+
+<file path="backend/app/models.py">
+from datetime import datetime, timezone
+from enum import StrEnum
+from typing import Any, Optional
+
+from pgvector.sqlalchemy import VECTOR
+from sqlalchemy import DateTime, String
+from sqlmodel import Field, Index, Relationship, SQLModel
+
+
+def get_datetime_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+# --- Enums ---
+
+
+class UploadJobStatus(StrEnum):
+    OPEN = "open"
+    UPLOADING = "uploading"
+    UPLOADED = "uploaded"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
+    DISCARD = "discard"
+
+
+# --- Base (shared fields) ---
+
+
+class ImageBase(SQLModel):
+    filename: str
+    uri: str
+    width: int | None = None
+    height: int | None = None
+    file_size: int | None = None
+
+
+# --- API input schemas ---
+
+
+class ImageCreate(ImageBase):
+    pass
+
+
+class ImageUpdate(SQLModel):
+    filename: str | None = None
+    uri: str | None = None
+    width: int | None = None
+    height: int | None = None
+    file_size: int | None = None
+
+
+class StartUploadRequest(SQLModel):
+    expected_image_count: int = Field(ge=1)
+
+
+# --- API response schemas ---
+
+
+class ImagePublic(ImageBase):
+    id: int
+    uploaded_at: datetime | None = None
+
+
+class ImagesPublic(SQLModel):
+    data: list[ImagePublic]
+    count: int
+
+
+class BatchUploadResponse(SQLModel):
+    failed: int = Field(ge=0)
+    uploaded_count: int = Field(ge=0)
+
+
+class UploadStatusChangeResponse(SQLModel):
+    job_id: str
+    status: UploadJobStatus
+
+
+class UploadJobPublic(SQLModel):
+    job_id: str
+    status: UploadJobStatus
+    expected_image_count: int
+    uploaded_count: int
+    created_at: datetime | None = None
+
+
+# --- Database tables ---
+
+
+class Image(ImageBase, table=True):
+    uri: str = Field(unique=True)
+    id: int | None = Field(default=None, primary_key=True)
+    uploaded_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),
+    )
+    clip_embedding: Optional["CLIP_Embedding"] = Relationship(back_populates="image")
+
+
+class CLIP_Embedding(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    image_id: int = Field(foreign_key="image.id", unique=True)
+    embedding: Any = Field(sa_type=VECTOR(512))
+    image: Image | None = Relationship(back_populates="clip_embedding")
+
+    __table_args__ = (
+        Index(
+            "ix_clip_embedding_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_with={"m": 16, "ef_construction": 64},
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
+    )
+
+
+class UploadJob(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    job_id: str = Field(unique=True, index=True)
+    status: UploadJobStatus = Field(default=UploadJobStatus.OPEN, sa_type=String())
+    expected_image_count: int = Field(ge=1)
+    uploaded_count: int = Field(default=0, ge=0)
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),
+    )
+</file>
+
+<file path=".env.example">
+# DB related
+POSTGRES_USER=root
+POSTGRES_PASSWORD=rootpass
+POSTGRES_DB=imagedb
+POSTGRES_PORT=5432
+POSTGRES_HOST=localhost
+
+# Model related
+CLIP_MODEL_NAME=openai/clip-vit-base-patch32
+CLIP_MODEL_PATH=/app/models/clip-32
+
+# Image upload
+UPLOAD_ROOT="/app/uploads"
+MAX_UPLOAD_BATCH_IMAGES=50
+MAX_CLIP_BATCH_IMAGES=100
+MAX_IMAGE_SIZE_MB=20
+</file>
+
+<file path="backend/pyproject.toml">
+[project]
+name = "app"
+version = "0.1.0"
+description = "Backend package of IMGDB project"
+
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.18.4",
+    "fastapi[standard]>=0.136.3",
+    "pgvector>=0.4.2",
+    "psycopg[binary]>=3.3.4",
+    "pydantic-settings>=2.14.1",
+    "python-multipart>=0.0.32",
+    "sqlmodel>=0.0.38",
+    "tenacity>=9.1.4",
+]
+
+[project.scripts]
+app = "app:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",
+]
+model-setup = [
+    "pillow>=12.2.0",
+    "torch>=2.12.1",
+    "torchvision>=0.27.1",
+    "transformers>=5.12.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+</file>
+
+<file path="docker-compose.yml">
+services:
+
+  db:
+    build: ./database
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      start_interval: 1s
+      start_period: 5s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        CLIP_MODEL_NAME: ${CLIP_MODEL_NAME}
+        CLIP_MODEL_PATH: ${CLIP_MODEL_PATH}
+    environment:
+      - POSTGRES_HOST=db
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    env_file:
+      - .env
+    volumes:
+      - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/utils/health-check/')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  postgres_data:
+  uploads_data:
+</file>
+
+<file path="backend/app/core/config.py">
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file="../.env",
+        env_ignore_empty=True,
+        extra="ignore",
+    )
+
+    PROJECT_NAME: str = "IMGDB"
+    VERSION: str = "0.1.0"
+    API_V1_STR: str = "/api/v1"
+
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str = "db"  # db service used IF dockerized.
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str
+
+    UPLOAD_ROOT: str = "/app/uploads"
+    MAX_UPLOAD_BATCH_IMAGES: int
+    MAX_CLIP_BATCH_IMAGES: int
+    MAX_IMAGE_SIZE_MB: int
+
+    CLIP_MODEL_NAME: str
+    CLIP_MODEL_PATH: str
+
+    @property
+    def DATABASE_URL(self) -> str:
+        return (
+            f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
+
+
+settings = Settings()
+</file>
+
+<file path=".gitignore">
+photos/*
+rough*
+output/
+imgdb_chroma/
+__pycache__/
+.env
+uploads
+*.egg-info
+</file>
+
+<file path="pyproject.toml">
+[project]
+name = "imgdb"
+version = "0.1.0"
+description = "Image query database"
+readme = "README.md"
+requires-python = ">=3.12"
+
+[tool.uv.workspace]
+members = [
+    "backend",
+    "cli",
+]
+</file>
+
+</files>
