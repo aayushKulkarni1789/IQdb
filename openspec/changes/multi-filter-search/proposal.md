@@ -1,11 +1,11 @@
 ## Why
 
-The backend ingests images and stores CLIP embeddings (`CLIP_Embedding.embedding VECTOR(512)` with an HNSW cosine index), but there is no query path that lets an LLM agent retrieve images by combining filters. A text-query-driven image search needs to combine **subset filters** (datetime, geo, face — narrow the candidate set via definite membership) with **rank filters** (CLIP similarity — continuous scores fused by Reciprocal Rank Fusion). This change builds that ecosystem: a Filter abstraction, a session that accumulates filter calls, and an orchestrator that enforces the required two-phase rule (all subsets first, then all ranks). CLIP is implemented end-to-end; datetime/geo/face are registered stubs so the contract and tool surface exist without depending on not-yet-built ingestion (EXIF, PostGIS, face models).
+The backend ingests images and stores CLIP embeddings (`CLIP_Embedding.embedding VECTOR(512)` with an **HNSW cosine index**), but there is no query path that lets an LLM agent retrieve images by combining filters. A text-query-driven image search needs to combine **subset filters** (datetime, geo, face — narrow the candidate set via definite membership) with **rank filters** (CLIP similarity — continuous scores fused by **Reciprocal Rank Fusion**). This change builds that ecosystem: a Filter abstraction, a session that accumulates filter calls, and an orchestrator that enforces the required two-phase rule (all subsets first, then all ranks). CLIP is implemented end-to-end; datetime/geo/face are registered stubs so the contract and tool surface exist without depending on not-yet-built ingestion (EXIF, PostGIS, face models).
 
 ## What Changes
 
 - Add a `Filter` abstraction split by output shape: `SubsetFilter` (contributes a SQL `WHERE` predicate) and `RankFilter` (contributes a rank CTE combined via RRF at finalize). Filters use lazy SQL push-down — the candidate set is a `Select`, never materialized as Python IDs until `LIMIT K`.
-- Implement `ClipRank`: text query -> `get_text_embeddings` (existing `core/clip.py`) -> pgvector `cosine_distance` ranking over `CLIP_Embedding`, reusing the existing HNSW cosine index.
+- Implement `ClipRank`: text query -> `get_text_embeddings` (existing `core/clip.py`) -> **pgvector** `cosine_distance` ranking over `CLIP_Embedding`, reusing the existing HNSW cosine index.
 - Add `DatetimeFilter`, `GeoFilter`, `FaceFilter` as registered template stubs (`build_predicate` raises `NotImplementedError`; the unified endpoint rejects them with `501` until implemented).
 - Add `SearchSession` persistence: a Postgres row holding an ordered JSONB `specs` log, a `finalized` boolean, and `created_at`. No `phase` field — phase is derived at finalize.
 - Add search API surface: `POST /sessions`, `POST /sessions/{id}/filters` (unified, accepts any filter kind in any order), `POST /sessions/{id}/finalize`.
@@ -15,7 +15,7 @@ The backend ingests images and stores CLIP embeddings (`CLIP_Embedding.embedding
 ## Capabilities
 
 ### New Capabilities
-- `image-search`: tool-driven multi-filter image search — session lifecycle (create / apply filters / finalize), subset filters that narrow via `WHERE`, rank filters buffered then fused by RRF, and a finalize that returns top-K hits. CLI/agent calls filters in any order; phase is enforced only inside finalize.
+- `image-search`: tool-driven multi-filter image search — session lifecycle (create / apply filters / finalize), subset filters that narrow via `WHERE`, rank filters buffered then fused by RRF, and a **Finalize** that returns **Top-K** hits. CLI/agent calls filters in any order; phase is enforced only inside finalize.
 
 ### Modified Capabilities
 <!-- none — no existing spec-level behaviour changes -->
