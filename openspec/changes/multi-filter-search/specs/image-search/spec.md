@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Search session lifecycle
-An agent creates a search session, applies filters in any order, then finalizes to obtain Top-K image hits. The session is terminal: once finalized it cannot accept more filters or be finalized again.
+An agent SHALL create a search session, apply filters in any order, then finalize to obtain Top-K image hits. The session MUST be terminal: once finalized it MUST NOT accept more filters or be finalized again.
 
 Feature: image-search
 Rule: a session accumulates an ordered filter spec log and is finalized exactly once
@@ -30,7 +30,7 @@ Rule: a session accumulates an ordered filter spec log and is finalized exactly 
 - **THEN** the API returns `409 Conflict`
 
 ### Requirement: Subset filters narrow the candidate pool via WHERE
-Subset filters (datetime, geo, face) are definite-membership filters that narrow the candidate set by contributing a `WHERE` predicate to a lazy SQL `Select`. They are composed as an intersect (AND) of all subset predicates at finalize.
+Subset filters (datetime, geo, face) MUST be definite-membership filters that narrow the candidate set by contributing a `WHERE` predicate to a lazy SQL `Select`. They SHALL be composed as an intersect (AND) of all subset predicates at finalize.
 
 Feature: image-search
 Rule: subset predicates are commutative and compose by intersection
@@ -48,7 +48,7 @@ Rule: subset predicates are commutative and compose by intersection
 - **AND** no image IDs are materialized into Python until the final `LIMIT K`
 
 ### Requirement: Rank filters are buffered and fused by Reciprocal Rank Fusion
-Rank filters (CLIP similarity) emit a rank CTE rather than a `WHERE` predicate. All rank filters are buffered and, at finalize, fused by Reciprocal Rank Fusion (RRF, `k=60`) into a score per image id. The candidate set is the phase-1 subset-narrowed pool.
+Rank filters (CLIP similarity) SHALL emit a rank CTE rather than a `WHERE` predicate. All rank filters MUST be buffered and, at finalize, fused by Reciprocal Rank Fusion (RRF, `k=60`) into a score per image id. The candidate set MUST be the phase-1 subset-narrowed pool.
 
 Feature: image-search
 Rule: rank filters contribute (id, row_number) CTEs fused as SUM(weight/(k+rank))
@@ -67,7 +67,7 @@ Rule: rank filters contribute (id, row_number) CTEs fused as SUM(weight/(k+rank)
 - **AND** the narrowed candidate set is returned ordered by `Image.id` with `score: null`
 
 ### Requirement: CLIP rank filter is implemented end-to-end
-The `ClipRank` filter accepts a text query, computes the text embedding via the existing `get_text_embeddings`, and ranks candidate images by `cosine_distance` over the existing `CLIP_Embedding` HNSW cosine index. The text query is stored in the filter spec; the vector is recomputed at finalize.
+The `ClipRank` filter MUST accept a text query, compute the text embedding via the existing `get_text_embeddings`, and rank candidate images by `cosine_distance` over the existing `CLIP_Embedding` HNSW cosine index. The text query SHALL be stored in the filter spec; the vector MUST be recomputed at finalize.
 
 Feature: image-search
 Rule: CLIP ranking reuses the existing pgvector HNSW index
@@ -79,7 +79,7 @@ Rule: CLIP ranking reuses the existing pgvector HNSW index
 - **AND** ranking uses `CLIP_Embedding.embedding.cosine_distance(vec)` over the indexed column
 
 ### Requirement: Datetime, geo, and face filters are registered stubs
-`DatetimeFilter`, `GeoFilter`, and `FaceFilter` are registered in the filter registry so their contract and tool surface exist, but their `build_predicate` is unimplemented and rejected at add-time until the underlying ingestion (EXIF, PostGIS, face models) is built.
+`DatetimeFilter`, `GeoFilter`, and `FaceFilter` MUST be registered in the filter registry so their contract and tool surface exist, but their `build_predicate` SHALL be unimplemented and rejected at add-time until the underlying ingestion (EXIF, PostGIS, face models) is built.
 
 Feature: image-search
 Rule: stubs are advertised as not live and fail fast at add-time
@@ -97,7 +97,7 @@ Rule: stubs are advertised as not live and fail fast at add-time
 - **AND** `DatetimeFilter`, `GeoFilter`, and `FaceFilter` are advertised as not implemented
 
 ### Requirement: Phase is derived at finalize, not stored
-Tool-call order is free; the two-phase execution (all subsets first, then all ranks) is enforced only inside finalize by bucketing filter specs by kind. The session stores no `phase` field.
+Tool-call order MUST be free; the two-phase execution (all subsets first, then all ranks) SHALL be enforced only inside finalize by bucketing filter specs by kind. The session MUST store no `phase` field.
 
 Feature: image-search
 Rule: phase is a function of the spec list, computed at finalize

@@ -32,7 +32,7 @@ router = APIRouter(prefix="/uploads", tags=["uploads"])
 
 
 # Start an upload
-@router.post("/start", response_model=UploadStatusChangeResponse)
+@router.post("/start", response_model=UploadStatusChangeResponse, status_code=201)
 def start_upload(
     body: StartUploadRequest,
     db: SessionDep,

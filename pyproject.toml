@@ -10,3 +10,10 @@ members = [
     "backend",
     "cli",
 ]
+
+[dependency-groups]
+test = [
+    "pytest>=8.0",
+    "httpx>=0.27",
+    "pillow>=12.2.0",
+]

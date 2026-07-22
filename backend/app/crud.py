@@ -5,7 +5,13 @@ from sqlalchemy import update
 from sqlmodel import Session, select
 
 from app.core.config import settings
-from app.models import CLIP_Embedding, Image, UploadJob, UploadJobStatus
+from app.models import (
+    CLIP_Embedding,
+    Image,
+    SearchSession,
+    UploadJob,
+    UploadJobStatus,
+)
 
 
 def create_upload_job(
@@ -181,3 +187,41 @@ def create_clip_embedding(
     db.flush()
     db.refresh(clip_embedding)
     return clip_embedding
+
+
+def create_search_session(db: Session) -> SearchSession:
+    session = SearchSession(specs=[], finalized=False)
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return session
+
+
+def get_search_session_by_id(
+    db: Session,
+    session_id: int,
+) -> SearchSession | None:
+    return db.exec(select(SearchSession).where(SearchSession.id == session_id)).first()
+
+
+def append_filter_spec(
+    db: Session,
+    session: SearchSession,
+    spec: dict,
+) -> SearchSession:
+    session.specs = list(session.specs) + [spec]
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return session
+
+
+def finalize_search_session(
+    db: Session,
+    session: SearchSession,
+) -> SearchSession:
+    session.finalized = True
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return session

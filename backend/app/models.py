@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 from pgvector.sqlalchemy import VECTOR
 from sqlalchemy import DateTime, String
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, Index, Relationship, SQLModel
 
 
@@ -120,6 +121,16 @@ class UploadJob(SQLModel, table=True):
     status: UploadJobStatus = Field(default=UploadJobStatus.OPEN, sa_type=String())
     expected_image_count: int = Field(ge=1)
     uploaded_count: int = Field(default=0, ge=0)
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),
+    )
+
+
+class SearchSession(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    specs: list[dict[str, Any]] = Field(default_factory=list, sa_type=JSONB)
+    finalized: bool = Field(default=False)
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),

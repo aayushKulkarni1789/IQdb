@@ -5,29 +5,33 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
-from sqlmodel.pool import StaticPool
+from sqlalchemy import text
+from sqlmodel import Session, SQLModel
 
 from app.core.config import settings
+from app.core.db import engine
+from app.crud import create_clip_embedding, create_image
 from app.main import app
 
 
-@pytest.fixture(name="db_engine")
-def db_engine() -> Generator:
-    engine = create_engine(
-        "sqlite://",
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
+@pytest.fixture(scope="session", autouse=True)
+def _create_schema() -> Generator:
     SQLModel.metadata.create_all(engine)
-    yield engine
-    SQLModel.metadata.drop_all(engine)
+    yield
 
 
 @pytest.fixture(name="db_session")
-def db_session(db_engine) -> Generator:
-    with Session(db_engine) as session:
+def db_session() -> Generator:
+    with Session(engine) as session:
         yield session
+        session.rollback()
+        session.exec(
+            text(
+                "TRUNCATE TABLE searchsession, clip_embedding, image, uploadjob "
+                "RESTART IDENTITY CASCADE;"
+            )
+        )
+        session.commit()
 
 
 @pytest.fixture(name="client")
@@ -55,7 +59,6 @@ def tmp_upload_root() -> Generator:
 
 @pytest.fixture(name="sample_image_bytes")
 def sample_image_bytes() -> bytes:
-    # Minimal valid JPEG: 1x1 white pixel
     return (
         b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00"
         b"\xff\xdb\x00C\x00\x08\x06\x06\x07\x06\x05\x08\x07\x07\x07\t\t"
@@ -67,3 +70,21 @@ def sample_image_bytes() -> bytes:
         b"\xff\xda\x00\x08\x01\x01\x00\x00?\x00T\xdb\x9e\x97\xfa\xce"
         b"\xff\xd9"
     )
+
+
+def seed_images(db_session: Session, n: int) -> list[int]:
+    ids: list[int] = []
+    for i in range(n):
+        img = create_image(
+            db_session,
+            filename=f"seed_{i}.jpg",
+            uri=f"/seed_{i}.jpg",
+        )
+        create_clip_embedding(
+            db_session,
+            image_id=img.id,
+            embedding=[1.0 if i == k else 0.0 for k in range(512)],
+        )
+        ids.append(img.id)
+    db_session.commit()
+    return ids

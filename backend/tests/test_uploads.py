@@ -10,7 +10,7 @@ from app.core.config import settings
 
 def _create_job(client: TestClient, expected_count: int = 3) -> str:
     resp = client.post(
-        "/api/v1/start_upload",
+        "/api/v1/uploads/start",
         json={"expected_image_count": expected_count},
     )
     assert resp.status_code == 201
@@ -20,11 +20,11 @@ def _create_job(client: TestClient, expected_count: int = 3) -> str:
 def _upload_batch(
     client: TestClient,
     job_id: str,
-    files: list[tuple[str, bytes, str]],
+    files: list[tuple[str, BytesIO, str]],
 ) -> dict:
     return client.post(
         f"/api/v1/uploads/{job_id}/batch",
-        files=files,
+        files=[("images", (name, data, ct)) for (name, data, ct) in files],
     )
 
 
@@ -44,13 +44,13 @@ def _make_image_file(
 class TestStartUpload:
     def test_start_upload(self, client: TestClient, tmp_upload_root: Path) -> None:
         resp = client.post(
-            "/api/v1/start_upload",
+            "/api/v1/uploads/start",
             json={"expected_image_count": 10},
         )
         assert resp.status_code == 201
         body = resp.json()
         assert "job_id" in body
-        assert body["status"] == "OK"
+        assert body["status"] == "open"
 
         job_dir = tmp_upload_root / body["job_id"]
         assert job_dir.exists()
@@ -58,7 +58,7 @@ class TestStartUpload:
 
     def test_start_upload_rejects_zero_count(self, client: TestClient) -> None:
         resp = client.post(
-            "/api/v1/start_upload",
+            "/api/v1/uploads/start",
             json={"expected_image_count": 0},
         )
         assert resp.status_code == 422
@@ -216,10 +216,10 @@ class TestCompleteUpload:
         assert resp.status_code == 200
         body = resp.json()
         assert body["job_id"] == job_id
-        assert body["status"] == "OK"
+        assert body["status"] == "uploaded"
 
         resp = client.get(f"/api/v1/uploads/{job_id}")
-        assert resp.json()["status"] == "uploaded"
+        assert resp.json()["status"] == "completed"
 
     def test_complete_rejects_count_mismatch(
         self,
