@@ -171,3 +171,69 @@ def test_registry_advertises_liveness(client: TestClient) -> None:
     assert {"kind": "datetime", "live": False} in filters
     assert {"kind": "geo", "live": False} in filters
     assert {"kind": "face", "live": False} in filters
+
+
+def test_unknown_filter_kind_returns_422(
+    client: TestClient,
+    db_session: Session,
+) -> None:
+    ids = seed_images(db_session, 3)
+    session_id = _create_session(client)
+
+    resp = client.post(
+        f"/api/v1/sessions/{session_id}/filters",
+        json={"kind": "nonexistent_xyz"},
+    )
+    assert resp.status_code == 422
+
+    # Session still works — the bad spec was not stored
+    finalize = client.post(
+        f"/api/v1/sessions/{session_id}/finalize",
+        json={"top_k": 100},
+    )
+    assert finalize.status_code == 200
+    assert finalize.json()["number_of_images_in_output"] == len(ids)
+
+
+def test_two_phase_execution_with_mixed_filters(db_session: Session) -> None:
+    from sqlalchemy import func, literal, select
+
+    from app.models import Image
+    from app.search.filter import CandidateQuery, RankFilter, SubsetFilter
+
+    class _AlwaysTrueSubset(SubsetFilter):
+        kind = "_test_always_true"
+
+        def build_predicate(self):
+            return Image.id > 0
+
+    class _IdRank(RankFilter):
+        kind = "_test_id_rank"
+
+        def build_rank_cte(self, candidates):
+            subq = candidates.subquery()
+            return select(
+                subq.c.id.label("id"),
+                func.row_number().over(order_by=subq.c.id).label("rank"),
+                literal(self.weight).label("weight"),
+            ).select_from(subq)
+
+    ids = seed_images(db_session, 5)
+
+    # Construction order 1: subset first, rank second
+    cq1 = CandidateQuery(
+        subset_filters=[_AlwaysTrueSubset()],
+        rank_filters=[_IdRank()],
+    )
+    results1 = cq1.finalize(db_session, top_k=100)
+    assert len(results1) == len(ids)
+    assert all(score is not None for _, score in results1)
+    assert [r[0] for r in results1] == sorted(ids)
+
+    # Construction order 2: rank first, subset second — identical results
+    cq2 = CandidateQuery(
+        rank_filters=[_IdRank()],
+        subset_filters=[_AlwaysTrueSubset()],
+    )
+    results2 = cq2.finalize(db_session, top_k=100)
+    assert results1 == results2
