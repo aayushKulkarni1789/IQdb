@@ -16,7 +16,38 @@
 | 10 | `test_unknown_filter_kind_returns_422` | Unknown filter kind returns 422; session remains usable, finalize returns all images |
 | 11 | `test_two_phase_execution_with_mixed_filters` | Unit test of `CandidateQuery` with inline mock subset+rank filters; verifies RRF scores, all images returned, construction order independence |
 
-## `test_uploads.py` — 15 tests
+## `test_exif.py` — 19 tests
+
+### `TestExtractCaptureTime` (9 tests)
+
+| # | Test | What it does |
+|---|---|---|
+| 1 | `test_prefers_datetime_original` | DateTimeOriginal + offset → parsed datetime with timezone |
+| 2 | `test_negative_offset` | DateTimeOriginal with `-08:00` → correct negative offset |
+| 3 | `test_fallback_to_datetime_digitized` | No DateTimeOriginal, DateTimeDigitized present → fallback works |
+| 4 | `test_prefers_original_over_digitized` | Both tags present → DateTimeOriginal preferred |
+| 5 | `test_none_when_datetime_original_missing_offset` | DateTimeOriginal present but no offset → NULL |
+| 6 | `test_none_when_no_datetime_tags` | No datetime tags → NULL |
+| 7 | `test_none_when_no_exif` | No EXIF data → NULL |
+| 8 | `test_none_when_no_exif_data_mock` | Empty EXIF → NULL |
+| 9 | `test_none_when_datetime_digitized_missing_offset` | DateTimeDigitized present but no offset → NULL |
+
+### `TestExtractGps` (10 tests)
+
+| # | Test | What it does |
+|---|---|---|
+| 10 | `test_valid_gps_coordinates` | GPS N/W with DMS → correct signed decimal degrees |
+| 11 | `test_gps_dms_with_seconds` | GPS S/E with DMS including seconds → correct conversion |
+| 12 | `test_none_when_gps_ifd_absent` | No GPS IFD → NULL |
+| 13 | `test_none_when_no_exif` | No EXIF → NULL |
+| 14 | `test_none_when_lat_missing` | Latitude tag absent → NULL |
+| 15 | `test_none_when_lon_missing` | Longitude tag absent → NULL |
+| 16 | `test_none_when_lat_out_of_bounds` | Latitude > 90 → NULL |
+| 17 | `test_none_when_lon_out_of_bounds` | Longitude > 180 → NULL |
+| 18 | `test_none_when_bounds_edge_cases` | Lat=90, Lon=180 → valid (boundary values pass) |
+| 19 | `test_none_when_dms_tuple_invalid` | Invalid DMS format → NULL |
+
+## `test_uploads.py` — 16 tests
 
 ### `TestStartUpload` (2 tests)
 
@@ -62,3 +93,9 @@
 | # | Test | What it does |
 |---|---|---|
 | 24 | `test_large_batch` | Upload `MAX_UPLOAD_BATCH_IMAGES` in one batch → 0 failures, correct count |
+
+### `TestExifIngestion` (1 test)
+
+| # | Test | What it does |
+|---|---|---|
+| 25 | `test_exif_data_stored_on_upload` | Upload EXIF-bearing JPEG, complete job → `capture_time`, `latitude`, `longitude` stored correctly |

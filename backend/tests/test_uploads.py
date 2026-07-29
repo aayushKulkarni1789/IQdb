@@ -1,11 +1,14 @@
+from datetime import datetime, timezone, timedelta
 from io import BytesIO
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session
+from PIL import Image as PILImage
+from sqlmodel import Session, select
 
 from app.core.config import settings
+from app.models import Image
 
 
 def _create_job(client: TestClient, expected_count: int = 3) -> str:
@@ -36,6 +39,23 @@ def _make_image_file(
     if data is None:
         data = b"\xff\xd8\xff" + b"\x00" * 100
     return (name, BytesIO(data), content_type)
+
+
+def _make_exif_image_file(
+    name: str = "exif.jpg",
+) -> tuple[str, BytesIO, str]:
+    img = PILImage.new("RGB", (4, 4))
+    exif = PILImage.Exif()
+    exif[0x9003] = "2024:06:15 14:30:00"
+    exif[0x9011] = "+05:30"
+    gps = exif.get_ifd(0x8825)
+    gps[0x0001] = "N"
+    gps[0x0002] = (40, 30, 0)
+    gps[0x0003] = "W"
+    gps[0x0004] = (74, 0, 0)
+    buf = BytesIO()
+    img.save(buf, "JPEG", exif=exif.tobytes())
+    return (name, BytesIO(buf.getvalue()), "image/jpeg")
 
 
 # --- Start Upload ---
@@ -258,3 +278,32 @@ class TestLargeBatch:
         body = resp.json()
         assert body["failed"] == 0
         assert body["uploaded_count"] == count
+
+
+# --- EXIF Integration ---
+
+
+class TestExifIngestion:
+    def test_exif_data_stored_on_upload(
+        self,
+        client: TestClient,
+        db_session: Session,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=1)
+        files = [_make_exif_image_file("exif_test.jpg")]
+        resp = _upload_batch(client, job_id, files)
+        assert resp.status_code == 200
+
+        resp = client.post(f"/api/v1/uploads/{job_id}/complete")
+        assert resp.status_code == 200
+
+        image = db_session.exec(select(Image)).first()
+        assert image is not None
+        assert image.capture_time is not None
+        expected = datetime(2024, 6, 15, 14, 30, 0, tzinfo=timezone(timedelta(hours=5, minutes=30)))
+        assert image.capture_time == expected
+        assert image.latitude is not None
+        assert abs(image.latitude - 40.5) < 0.001
+        assert image.longitude is not None
+        assert abs(image.longitude - (-74.0)) < 0.001

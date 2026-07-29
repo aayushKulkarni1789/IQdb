@@ -1,3 +1,4 @@
+from datetime import datetime
 import uuid
 from pathlib import Path
 
@@ -160,6 +161,9 @@ def create_image(
     width: int | None = None,
     height: int | None = None,
     file_size: int | None = None,
+    capture_time: datetime | None = None,
+    latitude: float | None = None,
+    longitude: float | None = None,
 ) -> Image:
     image = Image(
         filename=filename,
@@ -167,6 +171,9 @@ def create_image(
         width=width,
         height=height,
         file_size=file_size,
+        capture_time=capture_time,
+        latitude=latitude,
+        longitude=longitude,
     )
     db.add(image)
     db.flush()

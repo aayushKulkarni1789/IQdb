@@ -60,6 +60,9 @@ class StartUploadRequest(SQLModel):
 class ImagePublic(ImageBase):
     id: int
     uploaded_at: datetime | None = None
+    capture_time: datetime | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
 
 class ImagesPublic(SQLModel):
@@ -95,6 +98,12 @@ class Image(ImageBase, table=True):
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),
     )
+    capture_time: datetime | None = Field(
+        default=None,
+        sa_type=DateTime(timezone=True),
+    )
+    latitude: float | None = Field(default=None)
+    longitude: float | None = Field(default=None)
     clip_embedding: Optional["CLIP_Embedding"] = Relationship(back_populates="image")
 
 

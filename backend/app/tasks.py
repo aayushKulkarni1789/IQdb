@@ -14,6 +14,7 @@ from app.crud import (
     mark_job_discarded,
     mark_job_processing,
 )
+from app.search.exif import extract_capture_time, extract_gps
 
 logger = logging.getLogger(__name__)
 
@@ -80,11 +81,21 @@ def process_upload_embeddings(job_id: str) -> None:
                 # Prepare the table row for Image & CLIP_Embedding table
                 for f, embedding in zip(batch_files, embeddings):
                     file_size = f.stat().st_size
+                    width, height = None, None
+                    capture_time = None
+                    latitude = None
+                    longitude = None
                     try:
                         with PILImage.open(f) as img:
                             width, height = img.size
+                            capture_time = extract_capture_time(img)
+                            gps = extract_gps(img)
+                            if gps is not None:
+                                latitude, longitude = gps
                     except Exception:
-                        width, height = None, None
+                        logger.exception(
+                            "Job %s: failed to extract metadata from %s", job_id, f.name
+                        )
 
                     uri = f"{job_id}/images/{f.name}"
                     image = create_image(
@@ -94,6 +105,9 @@ def process_upload_embeddings(job_id: str) -> None:
                         width=width,
                         height=height,
                         file_size=file_size,
+                        capture_time=capture_time,
+                        latitude=latitude,
+                        longitude=longitude,
                     )
                     create_clip_embedding(db, image_id=image.id, embedding=embedding)
 
