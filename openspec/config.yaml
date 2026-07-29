@@ -9,5 +9,7 @@ rules:
     - Must use glossary skill and use technical terminology
   adr:
     - Must use architectural-decision-records skill
-  spec:
+  specs:
     - Must use gherkin-authoring skill
+  tasks:
+    - Must read docs/TASK_INSTRUCTIONS.md BEFORE exploring the codebase and planning any tasks.
