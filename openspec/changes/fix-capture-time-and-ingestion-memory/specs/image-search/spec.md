@@ -31,6 +31,12 @@ Rule: EXIF extraction runs during the existing process_upload_embeddings step; f
 - **WHEN** the background ingestion pipeline processes the upload
 - **THEN** `capture_time` is set to NULL
 
+#### Scenario: Embeddings are stored for the correct image when a batch contains an unreadable file
+- **GIVEN** an uploaded batch containing a file the ingestion pipeline cannot open and other valid images
+- **WHEN** the background ingestion pipeline processes the upload
+- **THEN** each valid image receives the embedding computed from itself
+- **AND** no embedding is stored for the unreadable file
+
 #### Scenario: GPS coordinates are extracted and validated
 - **GIVEN** an uploaded image with EXIF GPS IFD containing valid latitude and longitude
 - **WHEN** the background ingestion pipeline processes the upload
