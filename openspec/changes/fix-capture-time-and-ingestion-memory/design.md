@@ -26,7 +26,7 @@ Additionally, the per-batch loop `for f, embedding in zip(batch_files, embedding
 
 ## Decisions
 
-### 1. Read datetime tags from the ExifIFd sub-IFD with precedence
+### 1. Read datetime tags from the ExifIFD sub-IFD with precedence
 
 **Decision:** `extract_capture_time()` reads the ExifIFD sub-IFD (`0x8769`) via `exif_data.get_ifd(0x8769)` in addition to the top-level IFD, using the same pattern `extract_gps()` already applies to the GPS IFD (`0x8825`). Sub-IFD values take precedence over top-level values.
 
@@ -48,9 +48,9 @@ Additionally, the per-batch loop `for f, embedding in zip(batch_files, embedding
 
 ### 3. Extract metadata from the lazy handle, close immediately after inference
 
-**Decision:** In `process_upload_embeddings()`, after opening each file, extract metadata (`img.size`, `extract_capture_time`, `extract_gps`) from the same lazy-open handle — a header/EXIF-only operation that never decodes pixels and requires no additional read — before calling `get_image_embeddings(pil_images)`. Immediately after inference returns, call `img.close()` for every image in `pil_images`. Remove both the per-file re-open (`with PILImage.open(f)`) in the metadata phase and the late close loop after `db.commit()`.
+**Decision:** In `process_upload_embeddings()`, after opening each file, extract metadata (`file_size` via `os.fstat(img.fp.fileno()).st_size`, `img.size`, `extract_capture_time`, `extract_gps`) from the same lazy-open handle — a header/EXIF-only operation that never decodes pixels and requires no additional read — before calling `get_image_embeddings(pil_images)`. Immediately after inference returns, call `img.close()` for every image in `pil_images`. Remove both the per-file re-open (`with PILImage.open(f)`) in the metadata phase and the late close loop after `db.commit()`.
 
-**Why:** `PILImage.open()` is lazy: `size` and EXIF come from the file header, so metadata never needs decoded pixels and never re-reads the file. Decoded pixels are only required by the inference call, and are freed the moment it returns, so the DB-write loop runs at near-zero memory. The decode spike during inference is inherent to batching full-res images and is intentionally unchanged.
+**Why:** `PILImage.open()` is lazy: dimensions and EXIF come from the file header and the file size from the already-open descriptor, so metadata never needs decoded pixels and never re-reads the file. Decoded pixels are only required by the inference call, and are freed the moment it returns, so the DB-write loop runs at near-zero memory. The decode spike during inference is inherent to batching full-res images and is intentionally unchanged.
 
 **Alternatives considered:**
 - Keep the late close (current behavior): decoded images stay resident through the metadata re-open and DB writes, causing ~99% peak RAM.
@@ -59,7 +59,7 @@ Additionally, the per-batch loop `for f, embedding in zip(batch_files, embedding
 
 ### 4. Pair embeddings only with successfully-opened files
 
-**Decision:** Collect a metadata tuple per successfully-opened image alongside `pil_images` (the same list whose order produces `embeddings`), and zip that metadata with `embeddings` — never the raw `batch_files` list.
+**Decision:** Collect a metadata tuple (file size, dimensions, EXIF capture time, GPS) per successfully-opened image alongside `pil_images` (the same list whose order produces `embeddings`), and zip that metadata with `embeddings` — never the raw `batch_files` list.
 
 **Why:** Positional `zip(batch_files, embeddings)` silently misaligns when a file fails to open — the failed file is absent from `pil_images`, so embeddings shift and are stored against the wrong images. Since metadata and embeddings are both derived from the single `pil_images` success list, zipping them is trivially aligned and guarantees each embedding is stored with the image that generated it.
 
@@ -68,7 +68,7 @@ Additionally, the per-batch loop `for f, embedding in zip(batch_files, embedding
 
 ### 5. Tests mirror real camera EXIF layout
 
-**Decision:** Update `backend/tests/test_uploads.py:_make_exif_image_file` to write datetime/offset tags into the ExifIFd sub-IFD via `exif.get_ifd(0x8769)` (matching real camera output), and extend `backend/tests/test_exif.py`'s mock helper to model `get_ifd(0x8769)`. Add a corrupt-file batch test to exercise the embedding-pairing fix.
+**Decision:** Update `backend/tests/test_uploads.py:_make_exif_image_file` to write datetime/offset tags into the ExifIFD sub-IFD via `exif.get_ifd(0x8769)` (matching real camera output), and extend `backend/tests/test_exif.py`'s mock helper to model `get_ifd(0x8769)`. Add a corrupt-file batch test to exercise the embedding-pairing fix.
 
 **Why:** The prior integration test wrote tags to the top level, so it could not catch the sub-IFD bug — exactly why the defect shipped despite green tests.
 

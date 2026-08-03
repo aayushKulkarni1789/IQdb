@@ -7,7 +7,7 @@
 
 ## 2. Fix ingestion memory and embedding pairing
 
-- [ ] 2.1 In `process_upload_embeddings()` (`backend/app/tasks.py`), extract metadata (`img.size`, `extract_capture_time`, `extract_gps`) from each lazy-open handle before inference (header-only, no pixel decode, no re-read), then call `get_image_embeddings(pil_images)`, then close every image in `pil_images` immediately after inference returns. Remove the per-file re-open (`with PILImage.open(f)`) in the metadata phase and the late close loop after `db.commit()`. Do not change the `MAX_CLIP_BATCH_IMAGES` default.
+- [ ] 2.1 In `process_upload_embeddings()` (`backend/app/tasks.py`), extract metadata (file size via `os.fstat(img.fp.fileno()).st_size`, `img.size`, `extract_capture_time`, `extract_gps`) from each lazy-open handle before inference (header-only, no pixel decode, no re-read), then call `get_image_embeddings(pil_images)`, then close every image in `pil_images` immediately after inference returns. Remove the per-file re-open (`with PILImage.open(f)`) in the metadata phase and the late close loop after `db.commit()`. Do not change the `MAX_CLIP_BATCH_IMAGES` default.
 - [ ] 2.2 In the per-batch loop, zip embeddings with the metadata list collected from `pil_images` (the successfully-opened files), so a file that fails `PILImage.open()` does not shift embeddings onto the wrong image.
 
 ## 3. Update tests
