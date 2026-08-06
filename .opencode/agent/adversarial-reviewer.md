@@ -1,7 +1,7 @@
 ---
 description: Reviews adversarial-authoring drafts.
 mode: subagent
-model: openai/gpt-5.5
+model: opencode/mimo-v2.5-free
 permission:
   edit: allow
   bash: deny
