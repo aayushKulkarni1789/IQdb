@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     CLIP_MODEL_NAME: str
     CLIP_MODEL_PATH: str
 
+    LOG_LEVEL: str = "INFO"
+
     @property
     def DATABASE_URL(self) -> str:
         return (

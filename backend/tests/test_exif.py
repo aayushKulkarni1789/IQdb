@@ -7,16 +7,22 @@ from PIL import Image
 from app.search.exif import extract_capture_time, extract_gps
 
 
-def _mock_exif(tags: dict | None = None, gps_ifd: dict | None = None) -> MagicMock:
+def _mock_exif(
+    tags: dict | None = None,
+    gps_ifd: dict | None = None,
+    exif_ifd: dict | None = None,
+) -> MagicMock:
     exif = MagicMock()
     if tags is None:
         tags = {}
     exif.__getitem__.side_effect = lambda k: tags.get(k)
     exif.get.side_effect = lambda k, default=None: tags.get(k, default)
+    ifds = {}
     if gps_ifd is not None:
-        exif.get_ifd.return_value = gps_ifd
-    else:
-        exif.get_ifd.return_value = {}
+        ifds[0x8825] = gps_ifd
+    if exif_ifd is not None:
+        ifds[0x8769] = exif_ifd
+    exif.get_ifd.side_effect = lambda tag: ifds.get(tag, {})
     return exif
 
 
@@ -110,6 +116,90 @@ class TestExtractCaptureTime:
 
     def test_none_when_datetime_digitized_missing_offset(self) -> None:
         exif = _mock_exif(tags={0x9004: "2024:03:20 14:00:00"})
+        img = _mock_img(exif)
+        assert extract_capture_time(img) is None
+
+    def test_sub_ifd_tags_are_read(self) -> None:
+        exif = _mock_exif(
+            exif_ifd={
+                0x9003: "2024:05:10 09:00:00",
+                0x9011: "-07:00",
+            }
+        )
+        img = _mock_img(exif)
+        result = extract_capture_time(img)
+        assert result is not None
+        assert result == datetime(2024, 5, 10, 9, 0, 0, tzinfo=timezone(timedelta(hours=-7)))
+
+    def test_sub_ifd_takes_precedence_over_top_level(self) -> None:
+        exif = _mock_exif(
+            tags={
+                0x9003: "2024:01:15 10:30:00",
+                0x9011: "+05:30",
+            },
+            exif_ifd={
+                0x9003: "2024:06:15 14:30:00",
+                0x9011: "+05:30",
+            },
+        )
+        img = _mock_img(exif)
+        result = extract_capture_time(img)
+        assert result is not None
+        assert result == datetime(
+            2024, 6, 15, 14, 30, 0, tzinfo=timezone(timedelta(hours=5, minutes=30))
+        )
+
+    def test_sub_ifd_offset_only(self) -> None:
+        exif = _mock_exif(
+            tags={0x9003: "2024:01:15 10:30:00"},
+            exif_ifd={0x9011: "+05:30"},
+        )
+        img = _mock_img(exif)
+        result = extract_capture_time(img)
+        assert result is not None
+        assert result == datetime(
+            2024, 1, 15, 10, 30, 0, tzinfo=timezone(timedelta(hours=5, minutes=30))
+        )
+
+    def test_falls_through_to_digitized_when_original_incomplete(self) -> None:
+        exif = _mock_exif(
+            tags={
+                0x9003: "2024:01:15 10:30:00",
+                0x9004: "2024:03:20 14:00:00",
+                0x9012: "+00:00",
+            }
+        )
+        img = _mock_img(exif)
+        result = extract_capture_time(img)
+        assert result is not None
+        assert result == datetime(2024, 3, 20, 14, 0, 0, tzinfo=timezone.utc)
+
+    def test_falls_through_when_original_datetime_unparseable(self) -> None:
+        exif = _mock_exif(
+            tags={
+                0x9003: "not-a-date",
+                0x9011: "+05:30",
+                0x9004: "2024:03:20 14:00:00",
+                0x9012: "+00:00",
+            }
+        )
+        img = _mock_img(exif)
+        result = extract_capture_time(img)
+        assert result is not None
+        assert result == datetime(2024, 3, 20, 14, 0, 0, tzinfo=timezone.utc)
+
+    def test_none_only_when_no_pair_complete(self) -> None:
+        exif = _mock_exif(
+            tags={
+                0x9003: "2024:01:15 10:30:00",
+                0x9004: "2024:03:20 14:00:00",
+            }
+        )
+        img = _mock_img(exif)
+        assert extract_capture_time(img) is None
+
+    def test_none_when_sub_ifd_original_unparseable_and_no_complete_pair(self) -> None:
+        exif = _mock_exif(exif_ifd={0x9003: "not-a-date", 0x9011: "+05:30"})
         img = _mock_img(exif)
         assert extract_capture_time(img) is None
 

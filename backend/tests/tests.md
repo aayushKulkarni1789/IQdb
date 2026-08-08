@@ -16,9 +16,9 @@
 | 10 | `test_unknown_filter_kind_returns_422` | Unknown filter kind returns 422; session remains usable, finalize returns all images |
 | 11 | `test_two_phase_execution_with_mixed_filters` | Unit test of `CandidateQuery` with inline mock subset+rank filters; verifies RRF scores, all images returned, construction order independence |
 
-## `test_exif.py` — 19 tests
+## `test_exif.py` — 26 tests
 
-### `TestExtractCaptureTime` (9 tests)
+### `TestExtractCaptureTime` (16 tests)
 
 | # | Test | What it does |
 |---|---|---|
@@ -31,71 +31,84 @@
 | 7 | `test_none_when_no_exif` | No EXIF data → NULL |
 | 8 | `test_none_when_no_exif_data_mock` | Empty EXIF → NULL |
 | 9 | `test_none_when_datetime_digitized_missing_offset` | DateTimeDigitized present but no offset → NULL |
+| 10 | `test_sub_ifd_tags_are_read` | Tags present only in the ExifIFD sub-IFD (`0x8769`) → parsed with sub-IFD offset |
+| 11 | `test_sub_ifd_takes_precedence_over_top_level` | Same tag in both top-level and sub-IFD → sub-IFD value wins |
+| 12 | `test_sub_ifd_offset_only` | Datetime in top-level, offset in sub-IFD → merged into a complete pair |
+| 13 | `test_falls_through_to_digitized_when_original_incomplete` | DateTimeOriginal present but offset missing → falls through to DateTimeDigitized pair |
+| 14 | `test_falls_through_when_original_datetime_unparseable` | DateTimeOriginal unparseable → falls through to DateTimeDigitized pair |
+| 15 | `test_none_only_when_no_pair_complete` | Both pairs present but neither has an offset → NULL |
+| 16 | `test_none_when_sub_ifd_original_unparseable_and_no_complete_pair` | sub-IFD datetime unparseable, no complete fallback → NULL |
 
 ### `TestExtractGps` (10 tests)
 
 | # | Test | What it does |
 |---|---|---|
-| 10 | `test_valid_gps_coordinates` | GPS N/W with DMS → correct signed decimal degrees |
-| 11 | `test_gps_dms_with_seconds` | GPS S/E with DMS including seconds → correct conversion |
-| 12 | `test_none_when_gps_ifd_absent` | No GPS IFD → NULL |
-| 13 | `test_none_when_no_exif` | No EXIF → NULL |
-| 14 | `test_none_when_lat_missing` | Latitude tag absent → NULL |
-| 15 | `test_none_when_lon_missing` | Longitude tag absent → NULL |
-| 16 | `test_none_when_lat_out_of_bounds` | Latitude > 90 → NULL |
-| 17 | `test_none_when_lon_out_of_bounds` | Longitude > 180 → NULL |
-| 18 | `test_none_when_bounds_edge_cases` | Lat=90, Lon=180 → valid (boundary values pass) |
-| 19 | `test_none_when_dms_tuple_invalid` | Invalid DMS format → NULL |
+| 17 | `test_valid_gps_coordinates` | GPS N/W with DMS → correct signed decimal degrees |
+| 18 | `test_gps_dms_with_seconds` | GPS S/E with DMS including seconds → correct conversion |
+| 19 | `test_none_when_gps_ifd_absent` | No GPS IFD → NULL |
+| 20 | `test_none_when_no_exif` | No EXIF → NULL |
+| 21 | `test_none_when_lat_missing` | Latitude tag absent → NULL |
+| 22 | `test_none_when_lon_missing` | Longitude tag absent → NULL |
+| 23 | `test_none_when_lat_out_of_bounds` | Latitude > 90 → NULL |
+| 24 | `test_none_when_lon_out_of_bounds` | Longitude > 180 → NULL |
+| 25 | `test_none_when_bounds_edge_cases` | Lat=90, Lon=180 → valid (boundary values pass) |
+| 26 | `test_none_when_dms_tuple_invalid` | Invalid DMS format → NULL |
 
-## `test_uploads.py` — 16 tests
+## `test_uploads.py` — 17 tests
 
 ### `TestStartUpload` (2 tests)
 
 | # | Test | What it does |
 |---|---|---|
-| 10 | `test_start_upload` | Start upload with 10 images → 201, `"open"` status, job dir created |
-| 11 | `test_start_upload_rejects_zero_count` | `expected_image_count=0` → 422 |
+| 1 | `test_start_upload` | Start upload with 10 images → 201, `"open"` status, job dir created |
+| 2 | `test_start_upload_rejects_zero_count` | `expected_image_count=0` → 422 |
 
 ### `TestGetStatus` (2 tests)
 
 | # | Test | What it does |
 |---|---|---|
-| 12 | `test_get_status` | GET status returns correct job_id, status, counts, and `created_at` |
-| 13 | `test_get_status_404` | Nonexistent job ID → 404 |
+| 3 | `test_get_status` | GET status returns correct job_id, status, counts, and `created_at` |
+| 4 | `test_get_status_404` | Nonexistent job ID → 404 |
 
 ### `TestBatchUpload` (6 tests)
 
 | # | Test | What it does |
 |---|---|---|
-| 14 | `test_batch_single_image` | Upload 1 JPEG → 0 failures, file saved as `001_photo.jpg` |
-| 15 | `test_batch_multiple_images` | Upload 3 images (JPEG, PNG, JPEG) → 0 failures, sequential filenames |
-| 16 | `test_batch_rejects_non_image` | Upload `text/plain` → `failed=1`, `uploaded_count=0` |
-| 17 | `test_batch_404_nonexistent_job` | Batch upload to nonexistent job → 404 |
-| 18 | `test_batch_rejects_finalized_job` | Upload after job completion → 400 |
-| 19 | `test_first_batch_transitions_to_uploading` | First batch upload transitions status from `"open"` to `"uploading"` |
+| 5 | `test_batch_single_image` | Upload 1 JPEG → 0 failures, file saved as `001_photo.jpg` |
+| 6 | `test_batch_multiple_images` | Upload 3 images (JPEG, PNG, JPEG) → 0 failures, sequential filenames |
+| 7 | `test_batch_rejects_non_image` | Upload `text/plain` → `failed=1`, `uploaded_count=0` |
+| 8 | `test_batch_404_nonexistent_job` | Batch upload to nonexistent job → 404 |
+| 9 | `test_batch_rejects_finalized_job` | Upload after job completion → 400 |
+| 10 | `test_first_batch_transitions_to_uploading` | First batch upload transitions status from `"open"` to `"uploading"` |
 
 ### `TestResumeUpload` (1 test)
 
 | # | Test | What it does |
 |---|---|---|
-| 20 | `test_resume_upload` | Two separate batches → `uploaded_count=2`, sequential prefixes |
+| 11 | `test_resume_upload` | Two separate batches → `uploaded_count=2`, sequential prefixes |
 
 ### `TestCompleteUpload` (3 tests)
 
 | # | Test | What it does |
 |---|---|---|
-| 21 | `test_complete_upload` | Upload all, complete → status goes `"uploaded"` → `"completed"` |
-| 22 | `test_complete_rejects_count_mismatch` | Complete with 1/5 uploaded → 400 |
-| 23 | `test_complete_rejects_open_job` | Complete with 0 uploads → 400 |
+| 12 | `test_complete_upload` | Upload all, complete → status goes `"uploaded"` → `"completed"` |
+| 13 | `test_complete_rejects_count_mismatch` | Complete with 1/5 uploaded → 400 |
+| 14 | `test_complete_rejects_open_job` | Complete with 0 uploads → 400 |
 
 ### `TestLargeBatch` (1 test)
 
 | # | Test | What it does |
 |---|---|---|
-| 24 | `test_large_batch` | Upload `MAX_UPLOAD_BATCH_IMAGES` in one batch → 0 failures, correct count |
+| 15 | `test_large_batch` | Upload `MAX_UPLOAD_BATCH_IMAGES` in one batch → 0 failures, correct count |
 
 ### `TestExifIngestion` (1 test)
 
 | # | Test | What it does |
 |---|---|---|
-| 25 | `test_exif_data_stored_on_upload` | Upload EXIF-bearing JPEG, complete job → `capture_time`, `latitude`, `longitude` stored correctly |
+| 16 | `test_exif_data_stored_on_upload` | Upload EXIF-bearing JPEG, complete job → `capture_time`, `latitude`, `longitude` stored correctly (datetime tags read from the ExifIFD sub-IFD) |
+
+### `TestCorruptBatchIngestion` (1 test)
+
+| # | Test | What it does |
+|---|---|---|
+| 17 | `test_batch_with_corrupt_file_keeps_embeddings_aligned` | Batch containing one unopenable file → remaining valid images each receive the correct `capture_time` and the embedding computed from themselves; no embedding stored for the corrupt file |

@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 from PIL import Image as PILImage
@@ -64,13 +65,39 @@ def process_upload_embeddings(job_id: str) -> None:
                 )
 
                 pil_images = []
+                batch_metadata = []
                 for f in batch_files:
                     try:
-                        pil_images.append(PILImage.open(f))
+                        img = PILImage.open(f)
                     except Exception:
                         logger.exception(
                             "Job %s: failed to open image %s, skipping", job_id, f.name
                         )
+                        continue
+                    pil_images.append(img)
+                    try:
+                        file_size = os.fstat(img.fp.fileno()).st_size
+                        width, height = img.size
+                        capture_time = extract_capture_time(img)
+                        gps = extract_gps(img)
+                    except Exception:
+                        logger.exception(
+                            "Job %s: failed to extract metadata from %s", job_id, f.name
+                        )
+                        file_size, width, height, capture_time = None, None, None, None
+                        gps = None
+                    latitude, longitude = gps if gps is not None else (None, None)
+                    batch_metadata.append(
+                        {
+                            "filename": f.name,
+                            "file_size": file_size,
+                            "width": width,
+                            "height": height,
+                            "capture_time": capture_time,
+                            "latitude": latitude,
+                            "longitude": longitude,
+                        }
+                    )
 
                 if not pil_images:
                     continue
@@ -78,42 +105,27 @@ def process_upload_embeddings(job_id: str) -> None:
                 # Batch process images for getting embeddings
                 embeddings = get_image_embeddings(pil_images)
 
-                # Prepare the table row for Image & CLIP_Embedding table
-                for f, embedding in zip(batch_files, embeddings):
-                    file_size = f.stat().st_size
-                    width, height = None, None
-                    capture_time = None
-                    latitude = None
-                    longitude = None
-                    try:
-                        with PILImage.open(f) as img:
-                            width, height = img.size
-                            capture_time = extract_capture_time(img)
-                            gps = extract_gps(img)
-                            if gps is not None:
-                                latitude, longitude = gps
-                    except Exception:
-                        logger.exception(
-                            "Job %s: failed to extract metadata from %s", job_id, f.name
-                        )
+                # Release decoded pixels before any DB writes
+                for img in pil_images:
+                    img.close()
 
-                    uri = f"{job_id}/images/{f.name}"
+                # Prepare the table row for Image & CLIP_Embedding table
+                for meta, embedding in zip(batch_metadata, embeddings):
+                    uri = f"{job_id}/images/{meta['filename']}"
                     image = create_image(
                         db,
-                        filename=f.name,
+                        filename=meta["filename"],
                         uri=uri,
-                        width=width,
-                        height=height,
-                        file_size=file_size,
-                        capture_time=capture_time,
-                        latitude=latitude,
-                        longitude=longitude,
+                        width=meta["width"],
+                        height=meta["height"],
+                        file_size=meta["file_size"],
+                        capture_time=meta["capture_time"],
+                        latitude=meta["latitude"],
+                        longitude=meta["longitude"],
                     )
                     create_clip_embedding(db, image_id=image.id, embedding=embedding)
 
                 db.commit()
-                for img in pil_images:
-                    img.close()
                 logger.info("Job %s: batch %d/%d committed", job_id, batch_num, total_batches)
 
             mark_job_completed(db, job_id)

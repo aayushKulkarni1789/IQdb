@@ -53,4 +53,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 WORKDIR /app/backend/
 
-CMD ["bash", "-c", "python app/backend_pre_start.py && alembic upgrade head && fastapi run app/main.py"]
+CMD ["bash", "-c", "python app/backend_pre_start.py && alembic upgrade head && fastapi run app/main.py --log-level debug"]

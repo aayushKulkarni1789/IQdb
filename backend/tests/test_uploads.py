@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from PIL import Image as PILImage
 from sqlmodel import Session, select
 
+from app.core.clip import get_image_embeddings
 from app.core.config import settings
 from app.models import Image
 
@@ -43,11 +44,16 @@ def _make_image_file(
 
 def _make_exif_image_file(
     name: str = "exif.jpg",
+    datetime_str: str = "2024:06:15 14:30:00",
+    offset_str: str = "+05:30",
 ) -> tuple[str, BytesIO, str]:
     img = PILImage.new("RGB", (4, 4))
     exif = PILImage.Exif()
-    exif[0x9003] = "2024:06:15 14:30:00"
-    exif[0x9011] = "+05:30"
+    exif_ifd = exif.get_ifd(0x8769)
+    exif_ifd[0x9003] = datetime_str
+    exif_ifd[0x9011] = offset_str
+    exif_ifd[0x9004] = datetime_str
+    exif_ifd[0x9012] = offset_str
     gps = exif.get_ifd(0x8825)
     gps[0x0001] = "N"
     gps[0x0002] = (40, 30, 0)
@@ -307,3 +313,47 @@ class TestExifIngestion:
         assert abs(image.latitude - 40.5) < 0.001
         assert image.longitude is not None
         assert abs(image.longitude - (-74.0)) < 0.001
+
+
+# --- Corrupt File Batch ---
+
+
+class TestCorruptBatchIngestion:
+    def test_batch_with_corrupt_file_keeps_embeddings_aligned(
+        self,
+        client: TestClient,
+        db_session: Session,
+        tmp_upload_root: Path,
+    ) -> None:
+        job_id = _create_job(client, expected_count=3)
+        corrupt = _make_image_file("corrupt.jpg", data=b"not really a jpeg")
+        exif_a = _make_exif_image_file("a.jpg")
+        exif_b = _make_exif_image_file(
+            "b.jpg",
+            datetime_str="2023:01:01 08:00:00",
+            offset_str="+00:00",
+        )
+        resp = _upload_batch(client, job_id, [corrupt, exif_a, exif_b])
+        assert resp.status_code == 200
+        assert resp.json()["failed"] == 0
+
+        resp = client.post(f"/api/v1/uploads/{job_id}/complete")
+        assert resp.status_code == 200
+
+        images = db_session.exec(select(Image).order_by(Image.filename)).all()
+        assert len(images) == 2
+        by_name = {img.filename: img for img in images}
+        assert by_name["002_a.jpg"].capture_time == datetime(
+            2024, 6, 15, 14, 30, 0, tzinfo=timezone(timedelta(hours=5, minutes=30))
+        )
+        assert by_name["003_b.jpg"].capture_time == datetime(
+            2023, 1, 1, 8, 0, 0, tzinfo=timezone.utc
+        )
+
+        images_dir = tmp_upload_root / job_id / "images"
+        valid_files = sorted(p for p in images_dir.iterdir() if p.name != "001_corrupt.jpg")
+        assert [p.name for p in valid_files] == ["002_a.jpg", "003_b.jpg"]
+        references = get_image_embeddings([PILImage.open(p) for p in valid_files])
+        for img, ref in zip(images, references):
+            assert img.clip_embedding is not None
+            assert list(img.clip_embedding.embedding) == pytest.approx(ref)

@@ -7,6 +7,7 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 # EXIF tag IDs
+TAG_EXIF_IFD = 0x8769
 TAG_DATETIME_ORIGINAL = 0x9003
 TAG_OFFSET_TIME_ORIGINAL = 0x9011
 TAG_DATETIME_DIGITIZED = 0x9004
@@ -61,10 +62,20 @@ def _dms_to_decimal(
     return decimal
 
 
+def _get_tag(exif_data, sub_ifd, tag):
+    if sub_ifd is not None:
+        value = sub_ifd.get(tag)
+        if value is not None:
+            return value
+    return exif_data.get(tag)
+
+
 def extract_capture_time(img: Image.Image) -> datetime | None:
     exif_data = img.getexif()
     if not exif_data:
         return None
+
+    sub_ifd = exif_data.get_ifd(TAG_EXIF_IFD)
 
     datetime_tags = [
         (TAG_DATETIME_ORIGINAL, TAG_OFFSET_TIME_ORIGINAL),
@@ -72,25 +83,25 @@ def extract_capture_time(img: Image.Image) -> datetime | None:
     ]
 
     for dt_tag, offset_tag in datetime_tags:
-        dt_str = exif_data.get(dt_tag)
+        dt_str = _get_tag(exif_data, sub_ifd, dt_tag)
         if dt_str is None:
             continue
         dt = _parse_exif_datetime(str(dt_str))
         if dt is None:
             logger.warning("Failed to parse EXIF datetime tag 0x%04x: %s", dt_tag, dt_str)
-            return None
-        offset_str = exif_data.get(offset_tag)
+            continue
+        offset_str = _get_tag(exif_data, sub_ifd, offset_tag)
         if offset_str is None:
             logger.debug(
-                "EXIF datetime tag 0x%04x present but offset tag 0x%04x missing, returning None",
+                "EXIF datetime tag 0x%04x present but offset tag 0x%04x missing, skipping",
                 dt_tag,
                 offset_tag,
             )
-            return None
+            continue
         offset = _parse_offset(str(offset_str))
         if offset is None:
             logger.warning("Failed to parse EXIF offset tag 0x%04x: %s", offset_tag, offset_str)
-            return None
+            continue
         result = dt.replace(tzinfo=timezone(offset))
         logger.debug("Extracted capture_time: %s", result.isoformat())
         return result
