@@ -10,6 +10,7 @@ from app.models import CLIP_Embedding, Image
 RRF_K = 60
 
 
+# While creating a new filter, it is recommend to overload all the given methods and attributes.
 class Filter:
     """Base class for all search filters.
 
@@ -21,17 +22,21 @@ class Filter:
     kind: str = ""
     is_live: bool = True
 
+    # return the spec dictionary of this filter
     def to_spec(self) -> dict[str, Any]:
         return {"kind": self.kind}
 
+    # create the filter object from a spec dictionary
     @classmethod
     def from_spec(cls, spec: dict[str, Any]) -> "Filter":
         return cls()
 
 
+# A subset filter includes a "subset" of all images that satisfy a certain criteria.
 class SubsetFilter(Filter):
     """A filter that narrows the candidate set via a SQL ``WHERE`` predicate."""
 
+    # This function will contain the logic of creating the WHERE clause.
     def build_predicate(self) -> ColumnElement:
         raise NotImplementedError
 
@@ -50,6 +55,7 @@ class RankFilter(Filter):
         raise NotImplementedError
 
 
+# This is the main orchestrator that converts a list of ranked and subset filters into an SQL ORM expression
 class CandidateQuery:
     """Lazy SQL push-down of the candidate set (design D2).
 
@@ -74,6 +80,7 @@ class CandidateQuery:
         stmt = select(func.count()).select_from(self._universe.subquery())
         return int(db.exec(stmt).scalar_one())
 
+    # Finalize the filters and return the resultant image set
     def finalize(self, db: Session, top_k: int) -> list[tuple[int, float | None]]:
         pool = self._universe.subquery()
 
@@ -104,4 +111,5 @@ class CandidateQuery:
             .order_by(score_expr.desc())
             .limit(top_k)
         )
+        # Execute the finalized query and return the results.
         return [(row.id, float(row.score)) for row in db.exec(stmt)]

@@ -6,7 +6,7 @@ rules:
   proposal:
     - Must use grill-me skill before writing proposal AND Must use adversarial-authoring skill after writing proposal
   design:
-    - Must use glossary skill and use technical terminology
+    - Must use glossary skill and use simple technical language while writing design and glossary
   adr:
     - Must use architectural-decision-records skill
   specs:

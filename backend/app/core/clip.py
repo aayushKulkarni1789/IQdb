@@ -15,6 +15,9 @@ def _get_clip():
     return model, processor
 
 
+# Note: the embedding generation logic might differ from what an AI agent might suggest,
+# Because this is exclusive to transformers v5, which changed how clip inferencing works
+# https://github.com/huggingface/transformers/blob/main/MIGRATION_GUIDE_V5.md#feature-extraction-helpers-get__features
 def get_text_embeddings(texts: list[str]) -> list[list[float]]:
     model, processor = _get_clip()
     inputs = processor(text=texts, return_tensors="pt", padding=True)

@@ -31,7 +31,9 @@ class FinalizeRequest(SQLModel):
 
 class FilterAddRequest(SQLModel):
     """Unified filter-add body. ``kind`` selects the filter; remaining fields
-    are passed through to the filter implementation as the spec."""
+    are passed through to the filter implementation as the spec.
+    to_spec returns the json body of the request, hence the request should follow the
+    respective filter syntax"""
 
     kind: str
 
