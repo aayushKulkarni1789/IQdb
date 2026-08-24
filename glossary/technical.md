@@ -9,3 +9,8 @@
 | Filter Spec | Serialized filter config stored in `SearchSession.specs`, round-tripped via `to_spec()`/`from_spec()`. | Discussing JSONB persistence of a filter. | OpenSpec "spec" change artifacts. |
 | HNSW Cosine Index | The pgvector HNSW index on `CLIP_Embedding.embedding` (`vector_cosine_ops`) used for CLIP ranking. | Mentioning the embedding index. | Generic ANN index. |
 | pgvector | Postgres extension providing the `VECTOR(512)` type and cosine distance used for embeddings. | Naming the vector storage technology. | A generic vector database. |
+| Cleanup Sweep | The periodic in-process background pass that unconditionally deletes finalized SearchSession rows and terminal UploadJob rows. | Discussing finished-entity deletion; never call it TTL (Postgres has none). | "TTL", retention window, cron job. |
+| Terminal UploadJob | An UploadJob in status COMPLETED or DISCARD; both are final states eligible for sweep deletion. | Deciding what the sweep may delete. | Open or in-flight jobs. |
+| FilterKind | The StrEnum (CLIP, DATETIME, GEO, FACE) naming filter kinds; registry key and request-validation type. | Typing filter kinds in code and API schemas. | Bare string kinds. |
+| InvalidFilterSpecError | The ValueError raised when a filter spec has a valid kind but malformed fields; formats agent-actionable messages via from_validation. | Explaining 422 responses for bad filter specs. | Raw KeyError/500s. |
+| Ingestion Summary Log | The single end-of-job INFO line reporting totals, per-field metadata extraction counts, elapsed time, and status of an ingestion task. | Referring to ingestion observability output. | Per-image logging. |
