@@ -55,7 +55,7 @@ class RankFilter(Filter):
         raise NotImplementedError
 
 
-# This is the main orchestrator that converts a list of ranked and subset filters into an SQL ORM expression
+# This is the main orchestrator that converts a list of ranked and subset filters into an SQL ORM expression and return the images
 class CandidateQuery:
     """Lazy SQL push-down of the candidate set (design D2).
 
