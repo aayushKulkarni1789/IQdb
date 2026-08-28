@@ -4,9 +4,12 @@ from typing import Any
 from pydantic import ConfigDict
 from sqlmodel import SQLModel
 
+from app.search.filter import FilterKind
+
 
 class SearchHit(SQLModel):
     id: int
+    uri: str
     score: float | None = None
 
 
@@ -35,7 +38,9 @@ class FilterAddRequest(SQLModel):
     to_spec returns the json body of the request, hence the request should follow the
     respective filter syntax"""
 
-    kind: str
+    # Strictly typed so pydantic rejects unknown kinds at request validation
+    # with 422 and documents the valid set in OpenAPI (design D5).
+    kind: FilterKind
 
     model_config = ConfigDict(extra="allow")
 

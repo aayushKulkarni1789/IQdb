@@ -2,6 +2,8 @@ from datetime import datetime, timezone, timedelta
 from io import BytesIO
 from pathlib import Path
 
+import logging
+
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image as PILImage
@@ -9,7 +11,7 @@ from sqlmodel import Session, select
 
 from app.core.clip import get_image_embeddings
 from app.core.config import settings
-from app.models import Image
+from app.models import Image, UploadJob, UploadJobStatus
 
 
 def _create_job(client: TestClient, expected_count: int = 3) -> str:
@@ -357,3 +359,141 @@ class TestCorruptBatchIngestion:
         for img, ref in zip(images, references):
             assert img.clip_embedding is not None
             assert list(img.clip_embedding.embedding) == pytest.approx(ref)
+
+
+# --- Ingestion Summary Logging ---
+
+
+def _seed_job_files(
+    db_session: Session,
+    tmp_upload_root: Path,
+    files: list[tuple[str, bytes]],
+) -> str:
+    """Insert an UPLOADED job row and write its image files to disk."""
+    import uuid
+
+    job_id = uuid.uuid4().hex
+    images_dir = Path(tmp_upload_root) / job_id / "images"
+    images_dir.mkdir(parents=True)
+    for name, data in files:
+        (images_dir / name).write_bytes(data)
+
+    job = UploadJob(job_id=job_id, expected_image_count=len(files), status=UploadJobStatus.UPLOADED)
+    db_session.add(job)
+    db_session.commit()
+    return job_id
+
+
+def _jpeg_bytes(width: int = 4, height: int = 4, exif: PILImage.Exif | None = None) -> bytes:
+    img = PILImage.new("RGB", (width, height))
+    buf = BytesIO()
+    if exif is not None:
+        img.save(buf, "JPEG", exif=exif.tobytes())
+    else:
+        img.save(buf, "JPEG")
+    return buf.getvalue()
+
+
+def _last_summary_record(caplog: pytest.LogCaptureFixture) -> logging.LogRecord:
+    summaries = [
+        rec
+        for rec in caplog.records
+        if rec.name == "app.tasks" and "ingestion summary" in rec.getMessage()
+    ]
+    assert summaries, "expected an ingestion summary log line"
+    return summaries[-1]
+
+
+class TestIngestionSummary:
+    def test_successful_job_logs_full_summary(
+        self,
+        db_session: Session,
+        tmp_upload_root: Path,
+        caplog: pytest.LogCaptureFixture,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        # One EXIF-complete image, one plain image without metadata, one
+        # unreadable file: total counts it, opened_ok/written exclude it.
+        import app.tasks as tasks_module
+
+        monkeypatch.setattr(tasks_module, "get_image_embeddings", lambda imgs: [ [0.0] * 512 for _ in imgs ])
+
+        files = [
+            ("exif.jpg", _make_exif_image_file("exif.jpg")[1].getvalue()),
+            ("plain.jpg", _jpeg_bytes()),
+            ("corrupt.jpg", b"not really a jpeg"),
+        ]
+        job_id = _seed_job_files(db_session, tmp_upload_root, files)
+
+        with caplog.at_level(logging.INFO, logger="app.tasks"):
+            tasks_module.process_upload_embeddings(job_id)
+
+        msg = _last_summary_record(caplog).getMessage()
+        assert "status=completed" in msg
+        assert "total=3" in msg
+        assert "opened_ok=2" in msg
+        assert "written_to_db=2" in msg
+        assert "file_size=2" in msg
+        assert "dimensions=2" in msg
+        assert "capture_time=1" in msg
+        assert "gps=1" in msg
+        assert "elapsed_seconds=" in msg
+
+    def test_grouped_fields_require_all_constituents(
+        self,
+        db_session: Session,
+        tmp_upload_root: Path,
+        caplog: pytest.LogCaptureFixture,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        import app.tasks as tasks_module
+
+        monkeypatch.setattr(tasks_module, "get_image_embeddings", lambda imgs: [ [0.0] * 512 for _ in imgs ])
+        # GPS with latitude but no longitude must NOT count; capture time does.
+        monkeypatch.setattr(tasks_module, "extract_gps", lambda img: (40.5, None))
+        from datetime import datetime as dt
+
+        monkeypatch.setattr(
+            tasks_module, "extract_capture_time", lambda img: dt(2024, 1, 1, tzinfo=timezone.utc)
+        )
+
+        files = [("plain.jpg", _jpeg_bytes())]
+        job_id = _seed_job_files(db_session, tmp_upload_root, files)
+
+        with caplog.at_level(logging.INFO, logger="app.tasks"):
+            tasks_module.process_upload_embeddings(job_id)
+
+        msg = _last_summary_record(caplog).getMessage()
+        assert "gps=0" in msg
+        assert "capture_time=1" in msg
+        assert "status=completed" in msg
+
+    def test_failed_job_logs_partial_summary(
+        self,
+        db_session: Session,
+        tmp_upload_root: Path,
+        caplog: pytest.LogCaptureFixture,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        import app.tasks as tasks_module
+
+        def _explode(imgs):
+            raise RuntimeError("embedding backend exploded")
+
+        monkeypatch.setattr(tasks_module, "get_image_embeddings", _explode)
+
+        files = [("a.jpg", _jpeg_bytes()), ("b.jpg", _jpeg_bytes())]
+        job_id = _seed_job_files(db_session, tmp_upload_root, files)
+
+        with caplog.at_level(logging.INFO, logger="app.tasks"):
+            tasks_module.process_upload_embeddings(job_id)
+
+        msg = _last_summary_record(caplog).getMessage()
+        assert "status=failed" in msg
+        assert "total=2" in msg
+        assert "opened_ok=2" in msg
+        assert "written_to_db=0" in msg
+
+        # The job is still marked discarded after the failure.
+        job = db_session.exec(select(UploadJob).where(UploadJob.job_id == job_id)).one()
+        assert job.status == UploadJobStatus.DISCARD

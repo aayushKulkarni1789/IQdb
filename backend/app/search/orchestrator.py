@@ -8,7 +8,7 @@ from app.crud import (
     get_search_session_by_id,
 )
 from app.models import SearchSession
-from app.search.filter import CandidateQuery, RankFilter
+from app.search.filter import CandidateQuery, InvalidFilterSpecError, RankFilter
 from app.search.registry import UnknownFilterKindError, from_spec
 
 
@@ -37,6 +37,10 @@ def add_filter(db: Session, session_id: int, spec: dict) -> int:
     try:
         f = from_spec(spec)
     except UnknownFilterKindError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except InvalidFilterSpecError as exc:
+        # Valid kind but malformed spec: structured, actionable 422 instead
+        # of a raw KeyError/500 (design D6).
         raise HTTPException(status_code=422, detail=str(exc))
     if not f.is_live:
         raise HTTPException(

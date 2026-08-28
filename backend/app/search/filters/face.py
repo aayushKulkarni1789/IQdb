@@ -1,9 +1,24 @@
-from app.search.filter import SubsetFilter
+from typing import ClassVar, Literal
+
+from pydantic import BaseModel, ConfigDict
+
+from app.search.filter import FilterKind, SubsetFilter
+
+
+class FaceFilterSpec(BaseModel):
+    # Spec shape reserved for the future face implementation; only the kind
+    # field is required today (design D6).
+    model_config = ConfigDict(extra="ignore")
+
+    kind: Literal[FilterKind.FACE] = FilterKind.FACE
 
 
 class FaceFilter(SubsetFilter):
-    kind = "face"
+    kind = FilterKind.FACE
     is_live = False
+    spec_model = FaceFilterSpec
+    SPEC_FORMAT: ClassVar[str] = '{"kind": "face"}'
+    SPEC_EXAMPLE: ClassVar[dict] = {"kind": "face"}
 
     def build_predicate(self):
         raise NotImplementedError(
@@ -11,8 +26,8 @@ class FaceFilter(SubsetFilter):
         )
 
     def to_spec(self) -> dict:
-        return {"kind": "face"}
+        return {"kind": str(FilterKind.FACE)}
 
     @classmethod
-    def from_spec(cls, spec: dict) -> "FaceFilter":
+    def from_spec(cls, spec_model: FaceFilterSpec) -> "FaceFilter":
         return cls()

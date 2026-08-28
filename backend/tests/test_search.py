@@ -56,6 +56,8 @@ def test_finalize_returns_top_k(
     assert isinstance(body["hits"], list)
     for hit in body["hits"]:
         assert isinstance(hit["id"], int)
+        # Finalize hits carry uri alongside id and score (breaking change).
+        assert isinstance(hit["uri"], str) and hit["uri"]
         assert hit["score"] is None or isinstance(hit["score"], float)
 
     re_finalize = client.post(
@@ -227,7 +229,7 @@ def test_two_phase_execution_with_mixed_filters(db_session: Session) -> None:
     )
     results1 = cq1.finalize(db_session, top_k=100)
     assert len(results1) == len(ids)
-    assert all(score is not None for _, score in results1)
+    assert all(score is not None for _, _, score in results1)
     assert [r[0] for r in results1] == sorted(ids)
 
     # Construction order 2: rank first, subset second — identical results
@@ -237,3 +239,65 @@ def test_two_phase_execution_with_mixed_filters(db_session: Session) -> None:
     )
     results2 = cq2.finalize(db_session, top_k=100)
     assert results1 == results2
+
+
+def test_unknown_kind_422_lists_valid_values(client: TestClient) -> None:
+    # Strict FilterKind typing rejects unknown kinds at request validation,
+    # with pydantic's enum error naming every valid value.
+    session_id = _create_session(client)
+    resp = client.post(
+        f"/api/v1/sessions/{session_id}/filters",
+        json={"kind": "clipp"},
+    )
+    assert resp.status_code == 422
+    detail = str(resp.json())
+    for valid in ("clip", "datetime", "geo", "face"):
+        assert valid in detail
+
+    # No spec was appended — session still finalizes normally.
+    finalize = client.post(
+        f"/api/v1/sessions/{session_id}/finalize",
+        json={"top_k": 10},
+    )
+    assert finalize.status_code == 200
+
+
+def test_persisted_string_specs_round_trip(db_session: Session) -> None:
+    from app.search.registry import from_spec
+
+    f = from_spec({"kind": "clip", "text": "persisted spec", "weight": 2.0})
+    assert isinstance(f, object)
+    assert f.to_spec() == {"kind": "clip", "text": "persisted spec", "weight": 2.0}
+
+
+def test_malformed_clip_spec_returns_structured_422(client: TestClient) -> None:
+    # Valid kind but missing required text query: actionable 422 instead of a
+    # raw KeyError/500.
+    session_id = _create_session(client)
+    resp = client.post(
+        f"/api/v1/sessions/{session_id}/filters",
+        json={"kind": "clip"},
+    )
+    assert resp.status_code == 422
+    detail = resp.json()["detail"]
+    assert "Problems:" in detail
+    assert "text" in detail
+    assert "Expected format:" in detail
+    assert "Example:" in detail
+
+    # The bad spec was not appended to the session.
+    finalize = client.post(
+        f"/api/v1/sessions/{session_id}/finalize",
+        json={"top_k": 10},
+    )
+    assert finalize.status_code == 200
+
+
+def test_unknown_extra_fields_in_spec_are_ignored(client: TestClient) -> None:
+    session_id = _create_session(client)
+    resp = client.post(
+        f"/api/v1/sessions/{session_id}/filters",
+        json={"kind": "clip", "text": "a cat", "totally_unknown_field": 123},
+    )
+    assert resp.status_code == 200
+    assert isinstance(resp.json()["candidate_count"], int)

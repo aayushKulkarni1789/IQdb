@@ -46,7 +46,7 @@ def finalize_route(
     n, hits = finalize(db, session_id, top_k=body.top_k)
     return FinalizeResponse(
         number_of_images_in_output=n,
-        hits=[SearchHit(id=image_id, score=score) for image_id, score in hits],
+        hits=[SearchHit(id=image_id, uri=uri, score=score) for image_id, uri, score in hits],
     )
 
 

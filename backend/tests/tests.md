@@ -1,6 +1,6 @@
 # Test Cases
 
-## `test_search.py` — 11 tests
+## `test_search.py` — 15 tests
 
 | # | Test | What it does |
 |---|---|---|
@@ -15,6 +15,10 @@
 | 9 | `test_registry_advertises_liveness` | CLIP is `live=True`; `datetime`, `geo`, `face` are `live=False` |
 | 10 | `test_unknown_filter_kind_returns_422` | Unknown filter kind returns 422; session remains usable, finalize returns all images |
 | 11 | `test_two_phase_execution_with_mixed_filters` | Unit test of `CandidateQuery` with inline mock subset+rank filters; verifies RRF scores, all images returned, construction order independence |
+| 12 | `test_unknown_kind_422_lists_valid_values` | Unknown filter kind returns 422 with error detail naming every valid kind; session still finalizes normally |
+| 13 | `test_persisted_string_specs_round_trip` | `from_spec` creates a filter, `to_spec()` round-trips the original spec dict |
+| 14 | `test_malformed_clip_spec_returns_structured_422` | Valid kind but missing required `text` returns 422 with structured detail (`Problems:`, `text`, `Expected format:`, `Example:`); bad spec not appended |
+| 15 | `test_unknown_extra_fields_in_spec_are_ignored` | Unknown extra field in a valid spec is silently ignored, filter succeeds |
 
 ## `test_exif.py` — 26 tests
 
@@ -54,7 +58,7 @@
 | 25 | `test_none_when_bounds_edge_cases` | Lat=90, Lon=180 → valid (boundary values pass) |
 | 26 | `test_none_when_dms_tuple_invalid` | Invalid DMS format → NULL |
 
-## `test_uploads.py` — 17 tests
+## `test_uploads.py` — 20 tests
 
 ### `TestStartUpload` (2 tests)
 
@@ -112,3 +116,11 @@
 | # | Test | What it does |
 |---|---|---|
 | 17 | `test_batch_with_corrupt_file_keeps_embeddings_aligned` | Batch containing one unopenable file → remaining valid images each receive the correct `capture_time` and the embedding computed from themselves; no embedding stored for the corrupt file |
+
+### `TestIngestionSummary` (3 tests)
+
+| # | Test | What it does |
+|---|---|---|
+| 18 | `test_successful_job_logs_full_summary` | Seed EXIF, plain, and corrupt files; monkey-patch embeddings; verify ingestion summary log contains `status=completed`, `total=3`, `opened_ok=2`, `written_to_db=2`, field counts, and `elapsed_seconds` |
+| 19 | `test_grouped_fields_require_all_constituents` | Monkey-patch GPS to return `(40.5, None)` (missing longitude); verify `gps=0` in summary while `capture_time=1` still counted |
+| 20 | `test_failed_job_logs_partial_summary` | Monkey-patch embeddings to raise; verify summary shows `status=failed`, `total=2`, `opened_ok=2`, `written_to_db=0`; job status set to `DISCARD` |

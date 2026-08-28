@@ -1,23 +1,42 @@
+from typing import ClassVar, Literal
+
+from pydantic import BaseModel, ConfigDict
+from sqlalchemy import func, literal, select
+
 from app.core import clip
 from app.models import CLIP_Embedding
-from app.search.filter import RankFilter
-from sqlalchemy import func, literal, select
+from app.search.filter import FilterKind, RankFilter
+
+
+class ClipRankSpec(BaseModel):
+    # Pydantic spec model for the CLIP rank filter (design D6). Unknown extra
+    # fields are ignored so clients can send richer bodies safely.
+    model_config = ConfigDict(extra="ignore")
+
+    kind: Literal[FilterKind.CLIP] = FilterKind.CLIP
+    text: str
+    weight: float = 1.0
 
 
 class ClipRank(RankFilter):
-    kind = "clip"
+    kind = FilterKind.CLIP
     is_live = True
+    spec_model = ClipRankSpec
+    SPEC_FORMAT: ClassVar[str] = (
+        '{"kind": "clip", "text": "<search query>", "weight": <float, default 1.0>}'
+    )
+    SPEC_EXAMPLE: ClassVar[dict] = {"kind": "clip", "text": "a photo of a cat", "weight": 1.0}
 
     def __init__(self, text: str, weight: float = 1.0) -> None:
         self.text = text
         self.weight = weight
 
     def to_spec(self) -> dict:
-        return {"kind": "clip", "text": self.text, "weight": self.weight}
+        return {"kind": str(FilterKind.CLIP), "text": self.text, "weight": self.weight}
 
     @classmethod
-    def from_spec(cls, spec: dict) -> "ClipRank":
-        return cls(text=spec["text"], weight=float(spec.get("weight", 1.0)))
+    def from_spec(cls, spec_model: ClipRankSpec) -> "ClipRank":
+        return cls(text=spec_model.text, weight=spec_model.weight)
 
     def build_rank_cte(self, candidates):
         vec = clip.get_text_embeddings([self.text])[0]

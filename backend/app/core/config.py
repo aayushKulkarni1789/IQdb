@@ -28,6 +28,10 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
 
+    # Cleanup sweep interval in minutes; hours-scale default so test windows
+    # are never hit in practice (design D4).
+    SWEEP_INTERVAL_MINUTES: int = 1440
+
     @property
     def DATABASE_URL(self) -> str:
         return (
