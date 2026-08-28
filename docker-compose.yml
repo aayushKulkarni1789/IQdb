@@ -26,7 +26,7 @@ services:
         CLIP_MODEL_PATH: ${CLIP_MODEL_PATH}
     environment:
       - POSTGRES_HOST=db
-      - LOG_LEVEL=DEBUG
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     depends_on:
       db:
         condition: service_healthy
