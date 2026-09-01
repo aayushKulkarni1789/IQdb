@@ -1,8 +1,9 @@
 from enum import StrEnum
+from itertools import groupby
 from typing import Any, ClassVar
 
 from pydantic import BaseModel, ValidationError
-from sqlalchemy import ColumnElement, func, literal, select
+from sqlalchemy import ColumnElement, and_, func, literal, or_, select
 from sqlalchemy.sql import Select
 from sqlmodel import Session
 
@@ -112,8 +113,13 @@ class CandidateQuery:
         rank_filters: list[RankFilter],
     ) -> None:
         universe = select(Image.id)
-        for f in subset_filters:
-            universe = universe.where(f.build_predicate())
+        if subset_filters:
+            sorted_filters = sorted(subset_filters, key=lambda f: f.kind)
+            kind_groups = []
+            for _kind, group_iter in groupby(sorted_filters, key=lambda f: f.kind):
+                predicates = [f.build_predicate() for f in group_iter]
+                kind_groups.append(predicates[0] if len(predicates) == 1 else or_(*predicates))
+            universe = universe.where(and_(*kind_groups))
         self._universe = universe
         self._rank_filters = rank_filters
 

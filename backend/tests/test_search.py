@@ -293,6 +293,136 @@ def test_malformed_clip_spec_returns_structured_422(client: TestClient) -> None:
     assert finalize.status_code == 200
 
 
+def test_same_kind_subset_filters_compose_with_or(db_session: Session) -> None:
+    from sqlalchemy import select
+
+    from app.models import Image
+    from app.search.filter import CandidateQuery, SubsetFilter
+
+    class _KindASubset(SubsetFilter):
+        kind = "_test_kind_a"
+
+        def build_predicate(self):
+            return Image.id == 1
+
+    class _KindASubset2(SubsetFilter):
+        kind = "_test_kind_a"
+
+        def build_predicate(self):
+            return Image.id == 2
+
+    ids = seed_images(db_session, 5)
+
+    cq = CandidateQuery(
+        subset_filters=[_KindASubset(), _KindASubset2()],
+        rank_filters=[],
+    )
+    count = cq.candidate_count(db_session)
+    assert count == 2
+
+    results = cq.finalize(db_session, top_k=100)
+    returned_ids = [r[0] for r in results]
+    assert sorted(returned_ids) == [1, 2]
+
+
+def test_cross_kind_subset_filters_compose_with_and(db_session: Session) -> None:
+    from sqlalchemy import select
+
+    from app.models import Image
+    from app.search.filter import CandidateQuery, SubsetFilter
+
+    class _KindXSubset(SubsetFilter):
+        kind = "_test_kind_x"
+
+        def build_predicate(self):
+            # matches ids 1, 2, 3
+            return Image.id <= 3
+
+    class _KindYSubset(SubsetFilter):
+        kind = "_test_kind_y"
+
+        def build_predicate(self):
+            # matches ids 2, 3, 4
+            return Image.id >= 2
+
+    ids = seed_images(db_session, 5)
+
+    cq = CandidateQuery(
+        subset_filters=[_KindXSubset(), _KindYSubset()],
+        rank_filters=[],
+    )
+    count = cq.candidate_count(db_session)
+    assert count == 2  # intersection: {2, 3}
+
+    results = cq.finalize(db_session, top_k=100)
+    returned_ids = [r[0] for r in results]
+    assert sorted(returned_ids) == [2, 3]
+
+
+def test_single_subset_filter_no_regression(db_session: Session) -> None:
+    from app.models import Image
+    from app.search.filter import CandidateQuery, SubsetFilter
+
+    class _KindZSubset(SubsetFilter):
+        kind = "_test_kind_z"
+
+        def build_predicate(self):
+            return Image.id <= 2
+
+    ids = seed_images(db_session, 5)
+
+    cq = CandidateQuery(
+        subset_filters=[_KindZSubset()],
+        rank_filters=[],
+    )
+    count = cq.candidate_count(db_session)
+    assert count == 2
+
+    results = cq.finalize(db_session, top_k=100)
+    returned_ids = [r[0] for r in results]
+    assert sorted(returned_ids) == [1, 2]
+
+
+def test_union_same_kind_with_cross_kind_and(db_session: Session) -> None:
+    from sqlalchemy import select
+
+    from app.models import Image
+    from app.search.filter import CandidateQuery, SubsetFilter
+
+    class _KindM1(SubsetFilter):
+        kind = "_test_kind_m"
+
+        def build_predicate(self):
+            return Image.id == 1
+
+    class _KindM2(SubsetFilter):
+        kind = "_test_kind_m"
+
+        def build_predicate(self):
+            return Image.id == 2
+
+    class _KindN(SubsetFilter):
+        kind = "_test_kind_n"
+
+        def build_predicate(self):
+            # matches 1, 2, 3
+            return Image.id <= 3
+
+    ids = seed_images(db_session, 5)
+
+    cq = CandidateQuery(
+        subset_filters=[_KindM1(), _KindM2(), _KindN()],
+        rank_filters=[],
+    )
+    count = cq.candidate_count(db_session)
+    # M-group: {1} OR {2} = {1,2}; N-group: {1,2,3}; AND = {1,2}
+    assert count == 2
+
+    results = cq.finalize(db_session, top_k=100)
+    returned_ids = [r[0] for r in results]
+    assert sorted(returned_ids) == [1, 2]
+
+
 def test_unknown_extra_fields_in_spec_are_ignored(client: TestClient) -> None:
     session_id = _create_session(client)
     resp = client.post(
