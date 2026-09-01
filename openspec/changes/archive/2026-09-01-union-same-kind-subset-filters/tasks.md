@@ -13,5 +13,5 @@
 
 ## 3. Validate and archive
 
-- [x] 3.1 Run `openspec validate union-same-kind-subset-filters --type change --strict`
-- [x] 3.2 Run `openspec archive union-same-kind-subset-filters`
+- [ ] 3.1 Run `openspec validate union-same-kind-subset-filters --type change --strict`
+- [ ] 3.2 Run `openspec archive union-same-kind-subset-filters`
