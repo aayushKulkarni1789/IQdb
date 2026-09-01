@@ -5,7 +5,7 @@
 
 ## Review Summary
 
-ADR review completed for this change. No major durable architectural decisions were introduced — this change refines how `CandidateQuery` composes subset predicates, working within the existing taxonomy (ADR-0001), lazy push-down (ADR-0002), and RRF (ADR-0003) decisions.
+ADR review completed for this change. One new durable architectural decision was introduced: composing same-kind SubsetFilter predicates via union (OR) before intersecting across kinds (ADR-0006).
 
 ## In-Force ADRs Reviewed
 
@@ -16,4 +16,4 @@ ADR review completed for this change. No major durable architectural decisions w
 
 ## New Durable ADRs Created
 
-- None — the union-then-intersect composition is a tactical refinement of CandidateQuery, not a new architectural commitment. The grouping strategy (by FilterKind) follows naturally from ADR-0001's FilterKind enum.
+- ADR-0006: Union same-kind subset filters before cross-kind intersection — captures the decision to group SubsetFilter predicates by FilterKind and compose intra-kind with OR, cross-kind with AND.
