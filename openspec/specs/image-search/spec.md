@@ -33,10 +33,10 @@ Rule: a session accumulates an ordered filter spec log and is finalized exactly 
 - **THEN** the API returns `409 Conflict`
 
 ### Requirement: Subset filters narrow the candidate pool via WHERE
-Subset filters (datetime, geo, face) MUST be definite-membership filters that narrow the candidate set by contributing a `WHERE` predicate to a lazy SQL `Select`. They SHALL be composed as an intersect (AND) of all subset predicates at finalize.
+Subset filters (datetime, geo, face) MUST be definite-membership filters that narrow the candidate set by contributing a `WHERE` predicate to a lazy SQL `Select`. They SHALL be composed using union-then-intersect: subset filters of the same kind are composed with OR (union), and the resulting per-kind predicates are composed with AND (intersect) across different kinds.
 
 Feature: image-search
-Rule: subset predicates are commutative and compose by intersection
+Rule: same-kind subset filters union, cross-kind subset filters intersect
 
 #### Scenario: Candidate count reflects only subset narrowing
 - **GIVEN** an open search session
@@ -49,6 +49,17 @@ Rule: subset predicates are commutative and compose by intersection
 - **WHEN** filters are applied but finalize has not yet run
 - **THEN** the candidate set remains a SQL `Select` with predicates pushed down
 - **AND** no image IDs are materialized into Python until the final `LIMIT K`
+
+#### Scenario: Multiple same-kind subset filters compose with OR
+- **GIVEN** an open search session
+- **WHEN** the agent applies two subset filters of the same kind (e.g. two datetime range filters)
+- **THEN** the predicates are composed with OR so that images matching either range are included in the candidate set
+- **AND** `candidate_count` reflects the union of matching images, not the intersection
+
+#### Scenario: Cross-kind subset filters compose with AND
+- **GIVEN** an open search session
+- **WHEN** the agent applies subset filters of different kinds (e.g. one datetime filter and one geo filter)
+- **THEN** the per-kind OR groups are composed with AND so that images must satisfy all kind groups
 
 ### Requirement: Rank filters are buffered and fused by Reciprocal Rank Fusion
 Rank filters (CLIP similarity) SHALL emit a rank CTE rather than a `WHERE` predicate. All rank filters MUST be buffered and, at finalize, fused by Reciprocal Rank Fusion (RRF, `k=60`) into a score per image id. The candidate set MUST be the phase-1 subset-narrowed pool.
