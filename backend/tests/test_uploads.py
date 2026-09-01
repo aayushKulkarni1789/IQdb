@@ -309,7 +309,8 @@ class TestExifIngestion:
         image = db_session.exec(select(Image)).first()
         assert image is not None
         assert image.capture_time is not None
-        expected = datetime(2024, 6, 15, 14, 30, 0, tzinfo=timezone(timedelta(hours=5, minutes=30)))
+        # capture_time is stored as naive local time (ADR-0005) - offset is dropped
+        expected = datetime(2024, 6, 15, 14, 30, 0)
         assert image.capture_time == expected
         assert image.latitude is not None
         assert abs(image.latitude - 40.5) < 0.001
@@ -345,12 +346,9 @@ class TestCorruptBatchIngestion:
         images = db_session.exec(select(Image).order_by(Image.filename)).all()
         assert len(images) == 2
         by_name = {img.filename: img for img in images}
-        assert by_name["002_a.jpg"].capture_time == datetime(
-            2024, 6, 15, 14, 30, 0, tzinfo=timezone(timedelta(hours=5, minutes=30))
-        )
-        assert by_name["003_b.jpg"].capture_time == datetime(
-            2023, 1, 1, 8, 0, 0, tzinfo=timezone.utc
-        )
+        # capture_time is stored as naive local time (ADR-0005) - offset is dropped
+        assert by_name["002_a.jpg"].capture_time == datetime(2024, 6, 15, 14, 30, 0)
+        assert by_name["003_b.jpg"].capture_time == datetime(2023, 1, 1, 8, 0, 0)
 
         images_dir = tmp_upload_root / job_id / "images"
         valid_files = sorted(p for p in images_dir.iterdir() if p.name != "001_corrupt.jpg")
@@ -416,7 +414,9 @@ class TestIngestionSummary:
         # unreadable file: total counts it, opened_ok/written exclude it.
         import app.tasks as tasks_module
 
-        monkeypatch.setattr(tasks_module, "get_image_embeddings", lambda imgs: [ [0.0] * 512 for _ in imgs ])
+        monkeypatch.setattr(
+            tasks_module, "get_image_embeddings", lambda imgs: [[0.0] * 512 for _ in imgs]
+        )
 
         files = [
             ("exif.jpg", _make_exif_image_file("exif.jpg")[1].getvalue()),
@@ -448,7 +448,9 @@ class TestIngestionSummary:
     ) -> None:
         import app.tasks as tasks_module
 
-        monkeypatch.setattr(tasks_module, "get_image_embeddings", lambda imgs: [ [0.0] * 512 for _ in imgs ])
+        monkeypatch.setattr(
+            tasks_module, "get_image_embeddings", lambda imgs: [[0.0] * 512 for _ in imgs]
+        )
         # GPS with latitude but no longitude must NOT count; capture time does.
         monkeypatch.setattr(tasks_module, "extract_gps", lambda img: (40.5, None))
         from datetime import datetime as dt

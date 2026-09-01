@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Tuple
 
 from PIL import Image
@@ -78,11 +78,11 @@ def extract_capture_time(img: Image.Image) -> datetime | None:
     sub_ifd = exif_data.get_ifd(TAG_EXIF_IFD)
 
     datetime_tags = [
-        (TAG_DATETIME_ORIGINAL, TAG_OFFSET_TIME_ORIGINAL),
-        (TAG_DATETIME_DIGITIZED, TAG_OFFSET_TIME_DIGITIZED),
+        TAG_DATETIME_ORIGINAL,
+        TAG_DATETIME_DIGITIZED,
     ]
 
-    for dt_tag, offset_tag in datetime_tags:
+    for dt_tag in datetime_tags:
         dt_str = _get_tag(exif_data, sub_ifd, dt_tag)
         if dt_str is None:
             continue
@@ -90,21 +90,9 @@ def extract_capture_time(img: Image.Image) -> datetime | None:
         if dt is None:
             logger.warning("Failed to parse EXIF datetime tag 0x%04x: %s", dt_tag, dt_str)
             continue
-        offset_str = _get_tag(exif_data, sub_ifd, offset_tag)
-        if offset_str is None:
-            logger.debug(
-                "EXIF datetime tag 0x%04x present but offset tag 0x%04x missing, skipping",
-                dt_tag,
-                offset_tag,
-            )
-            continue
-        offset = _parse_offset(str(offset_str))
-        if offset is None:
-            logger.warning("Failed to parse EXIF offset tag 0x%04x: %s", offset_tag, offset_str)
-            continue
-        result = dt.replace(tzinfo=timezone(offset))
-        logger.debug("Extracted capture_time: %s", result.isoformat())
-        return result
+        # Store as naive local time (ADR-0005) - discard timezone offset
+        logger.debug("Extracted capture_time: %s", dt.isoformat())
+        return dt
 
     return None
 

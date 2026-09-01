@@ -47,9 +47,14 @@ def add_filter(db: Session, session_id: int, spec: dict) -> int:
             status_code=501,
             detail=f"Filter '{f.kind}' is not implemented",
         )
+    # Validate candidate query before persisting: if the predicate SQL is
+    # invalid (e.g., PG syntax error), raise before committing so retries
+    # don't accumulate duplicate specs.
+    all_specs = list(session.specs) + [spec]
+    cq = _build_candidate_query(all_specs)
+    count = cq.candidate_count(db)
     session = append_filter_spec(db, session, spec)
-    cq = _build_candidate_query(session.specs)
-    return cq.candidate_count(db)
+    return count
 
 
 def finalize(db: Session, session_id: int, top_k: int = 100):

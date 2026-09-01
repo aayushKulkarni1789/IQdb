@@ -152,11 +152,25 @@ def test_clip_rank_end_to_end(
 
 def test_stub_filter_rejected_at_add_time(client: TestClient) -> None:
     session_id = _create_session(client)
+    # datetime is now a live filter, should be accepted
     resp = client.post(
         f"/api/v1/sessions/{session_id}/filters",
         json={"kind": "datetime"},
     )
-    assert resp.status_code == 501
+    assert resp.status_code == 200
+
+    # geo and face remain stubs and should be rejected with 501
+    resp_geo = client.post(
+        f"/api/v1/sessions/{session_id}/filters",
+        json={"kind": "geo"},
+    )
+    assert resp_geo.status_code == 501
+
+    resp_face = client.post(
+        f"/api/v1/sessions/{session_id}/filters",
+        json={"kind": "face"},
+    )
+    assert resp_face.status_code == 501
 
     finalize_resp = client.post(
         f"/api/v1/sessions/{session_id}/finalize",
@@ -170,7 +184,7 @@ def test_registry_advertises_liveness(client: TestClient) -> None:
     assert resp.status_code == 200
     filters = resp.json()
     assert {"kind": "clip", "live": True} in filters
-    assert {"kind": "datetime", "live": False} in filters
+    assert {"kind": "datetime", "live": True} in filters
     assert {"kind": "geo", "live": False} in filters
     assert {"kind": "face", "live": False} in filters
 

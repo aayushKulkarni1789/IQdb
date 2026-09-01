@@ -100,7 +100,7 @@ class Image(ImageBase, table=True):
     )
     capture_time: datetime | None = Field(
         default=None,
-        sa_type=DateTime(timezone=True),
+        sa_type=DateTime(timezone=False),
     )
     latitude: float | None = Field(default=None)
     longitude: float | None = Field(default=None)
