@@ -1,5 +1,6 @@
 from datetime import date, time
 from enum import Enum
+from pathlib import Path
 from typing import ClassVar, Literal
 
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -7,6 +8,11 @@ from sqlalchemy import Date, Time, and_, cast, func, literal
 
 from app.models import Image
 from app.search.filter import FilterKind, SubsetFilter
+
+try:
+    _DATETIME_DESCRIPTION = Path(__file__).with_suffix(".md").read_text(encoding="utf-8")
+except FileNotFoundError:
+    _DATETIME_DESCRIPTION = ""
 
 
 class DayOfWeek(str, Enum):
@@ -73,6 +79,7 @@ class DatetimeFilter(SubsetFilter):
         "time_upper": "18:00:00",
         "days_included": ["MONDAY", "WEDNESDAY"],
     }
+    DESCRIPTION: ClassVar[str] = _DATETIME_DESCRIPTION
 
     def __init__(
         self,

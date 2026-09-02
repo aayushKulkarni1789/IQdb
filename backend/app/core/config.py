@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file="../.env",
+        env_file=["../.env", "../../.env", "../../../.env", ".env"],
         env_ignore_empty=True,
         extra="ignore",
     )
@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     # Cleanup sweep interval in minutes; hours-scale default so test windows
     # are never hit in practice (design D4).
     SWEEP_INTERVAL_MINUTES: int = 1440
+
+    LLM_BASE_URL: str = "http://localhost:8080/v1"
+    LLM_API_KEY: str = ""
+    LLM_MODEL: str
+    LLM_TEMPERATURE: float = 0.0
 
     @property
     def DATABASE_URL(self) -> str:

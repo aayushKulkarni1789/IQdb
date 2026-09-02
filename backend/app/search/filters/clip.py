@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import ClassVar, Literal
 
 from pydantic import BaseModel, ConfigDict
@@ -6,6 +7,13 @@ from sqlalchemy import func, literal, select
 from app.core import clip
 from app.models import CLIP_Embedding
 from app.search.filter import FilterKind, RankFilter
+
+# Description is authored in clip.md alongside this module so prompt
+# content stays in sync with filter semantics.
+try:
+    _CLIP_DESCRIPTION = Path(__file__).with_suffix(".md").read_text(encoding="utf-8")
+except FileNotFoundError:
+    _CLIP_DESCRIPTION = ""
 
 
 class ClipRankSpec(BaseModel):
@@ -26,6 +34,7 @@ class ClipRank(RankFilter):
         '{"kind": "clip", "text": "<search query>", "weight": <float, default 1.0>}'
     )
     SPEC_EXAMPLE: ClassVar[dict] = {"kind": "clip", "text": "a photo of a cat", "weight": 1.0}
+    DESCRIPTION: ClassVar[str] = _CLIP_DESCRIPTION
 
     def __init__(self, text: str, weight: float = 1.0) -> None:
         self.text = text

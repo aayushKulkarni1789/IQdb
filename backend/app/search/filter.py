@@ -63,6 +63,7 @@ class Filter:
     spec_model: ClassVar[type[BaseModel]]
     SPEC_FORMAT: ClassVar[str] = ""
     SPEC_EXAMPLE: ClassVar[Any] = {}
+    DESCRIPTION: ClassVar[str] = ""
     is_live: bool = True
 
     # return the spec dictionary of this filter

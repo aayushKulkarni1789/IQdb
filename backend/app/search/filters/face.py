@@ -1,8 +1,14 @@
+from pathlib import Path
 from typing import ClassVar, Literal
 
 from pydantic import BaseModel, ConfigDict
 
 from app.search.filter import FilterKind, SubsetFilter
+
+try:
+    _FACE_DESCRIPTION = Path(__file__).with_suffix(".md").read_text(encoding="utf-8")
+except FileNotFoundError:
+    _FACE_DESCRIPTION = ""
 
 
 class FaceFilterSpec(BaseModel):
@@ -19,6 +25,7 @@ class FaceFilter(SubsetFilter):
     spec_model = FaceFilterSpec
     SPEC_FORMAT: ClassVar[str] = '{"kind": "face"}'
     SPEC_EXAMPLE: ClassVar[dict] = {"kind": "face"}
+    DESCRIPTION: ClassVar[str] = _FACE_DESCRIPTION
 
     def build_predicate(self):
         raise NotImplementedError(

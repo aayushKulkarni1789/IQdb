@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from sqlmodel import Session
 
 from app.api.v1.main import api_router
+from app.api.v2.main import api_v2_router
 from app.core.cleanup import safe_run_cleanup_pass
 from app.core.config import settings
 from app.core.db import engine
@@ -54,3 +55,4 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION, lifespan=lifespan)
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(api_v2_router, prefix="/api/v2")
