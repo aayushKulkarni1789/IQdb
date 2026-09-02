@@ -8,3 +8,5 @@ uploads
 *.egg-info
 repomix-output.xml
 docs/TODO.md
+.cursor/
+.opencode/
