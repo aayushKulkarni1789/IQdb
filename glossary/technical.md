@@ -13,4 +13,5 @@
 | Terminal UploadJob | An UploadJob in status COMPLETED or DISCARD; both are final states eligible for sweep deletion. | Deciding what the sweep may delete. | Open or in-flight jobs. |
 | FilterKind | The StrEnum (CLIP, DATETIME, GEO, FACE) naming filter kinds; registry key and request-validation type. | Typing filter kinds in code and API schemas. | Bare string kinds. |
 | InvalidFilterSpecError | The ValueError raised when a filter spec has a valid kind but malformed fields; formats agent-actionable messages via from_validation. | Explaining 422 responses for bad filter specs. | Raw KeyError/500s. |
+| Agent Filter State | The mutable per-request list of Filter objects held in LangChain agent state that replaces the DB SearchSession in the v2 workflow. | Referring to the in-memory filter list owned by the agent during a single query. | Persisted SearchSession rows. |
 | Ingestion Summary Log | The single end-of-job INFO line reporting totals, per-field metadata extraction counts, elapsed time, and status of an ingestion task. | Referring to ingestion observability output. | Per-image logging. |
