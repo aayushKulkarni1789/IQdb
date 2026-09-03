@@ -51,19 +51,64 @@ def get_location_polygon(location_text: str) -> dict[str, Any]:
         "q": clean_text,
         "format": "json",
         "polygon_geojson": 1,
-        "limit": 1,
+        "limit": 10,
     }
     results = _fetch_nominatim(params)
     if not results:
         raise GeocodingError(f"Location not found: {location_text!r}")
 
-    top_hit = results[0]
-    geojson = top_hit.get("geojson")
-    if not geojson:
-        raise GeocodingError(f"No polygon geometry found for location: {location_text!r}")
+    # 1. First priority: look for a hit containing an actual Polygon or MultiPolygon
+    for hit in results:
+        geojson = hit.get("geojson")
+        if geojson and geojson.get("type") in ("Polygon", "MultiPolygon"):
+            logger.info(
+                "get_location_polygon('%s') -> found %s from hit '%s'",
+                location_text,
+                hit.get("display_name", ""),
+            )
+            return geojson
 
-    logger.info("get_location_polygon('%s') -> %s", location_text, geojson)
-    return geojson
+    # 2. Fallback: construct rectangular polygon from boundingbox if available
+    for hit in results:
+        bbox = hit.get("boundingbox")
+        if bbox and len(bbox) == 4:
+            try:
+                south, north = float(bbox[0]), float(bbox[1])
+                west, east = float(bbox[2]), float(bbox[3])
+                if south != north and west != east:
+                    bbox_polygon = {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [west, south],
+                                [east, south],
+                                [east, north],
+                                [west, north],
+                                [west, south],
+                            ]
+                        ],
+                    }
+                    logger.info(
+                        "get_location_polygon('%s') -> constructed bounding box polygon for '%s': %s",
+                        location_text,
+                        hit.get("display_name", ""),
+                        bbox_polygon,
+                    )
+                    return bbox_polygon
+            except (ValueError, TypeError):
+                continue
+
+    # 3. If only a single point or no valid boundingbox exists
+    top_geojson = results[0].get("geojson")
+    if top_geojson:
+        logger.warning(
+            "get_location_polygon('%s') -> no polygon/multipolygon or boundingbox found, using raw geojson: %s",
+            location_text,
+            top_geojson,
+        )
+        return top_geojson
+
+    raise GeocodingError(f"No polygon geometry or bounding box found for location: {location_text!r}")
 
 
 @lru_cache(maxsize=256)
