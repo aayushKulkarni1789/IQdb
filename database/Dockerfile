@@ -6,7 +6,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
 git \
 build-essential \
-postgresql-server-dev-18
+postgresql-server-dev-18 \
+postgresql-18-postgis-3
 
 # Install pgvector
 RUN cd /tmp && \

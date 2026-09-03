@@ -165,6 +165,11 @@ def create_image(
     latitude: float | None = None,
     longitude: float | None = None,
 ) -> Image:
+    location = (
+        f"SRID=4326;POINT({longitude} {latitude})"
+        if latitude is not None and longitude is not None
+        else None
+    )
     image = Image(
         filename=filename,
         uri=uri,
@@ -174,6 +179,7 @@ def create_image(
         capture_time=capture_time,
         latitude=latitude,
         longitude=longitude,
+        location=location,
     )
     db.add(image)
     db.flush()

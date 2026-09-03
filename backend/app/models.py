@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from enum import StrEnum
 from typing import Any, Optional
 
+from geoalchemy2 import Geography
 from pgvector.sqlalchemy import VECTOR
 from sqlalchemy import DateTime, String
 from sqlalchemy.dialects.postgresql import JSONB
@@ -101,10 +102,23 @@ class Image(ImageBase, table=True):
     capture_time: datetime | None = Field(
         default=None,
         sa_type=DateTime(timezone=False),
+        index=True,
     )
     latitude: float | None = Field(default=None)
     longitude: float | None = Field(default=None)
+    location: Any | None = Field(
+        default=None,
+        sa_type=Geography(geometry_type="POINT", srid=4326, spatial_index=False),
+    )
     clip_embedding: Optional["CLIP_Embedding"] = Relationship(back_populates="image")
+
+    __table_args__ = (
+        Index(
+            "idx_image_location_gist",
+            "location",
+            postgresql_using="gist",
+        ),
+    )
 
 
 class CLIP_Embedding(SQLModel, table=True):

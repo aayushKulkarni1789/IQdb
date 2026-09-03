@@ -93,6 +93,72 @@ def add_datetime_filter(
 
 
 @tool
+def add_location_within_filter(
+    location_text: str,
+    runtime: ToolRuntime = None,
+) -> str | Command:
+    """Add a location within subset filter. Finds images taken in a specific location polygon.
+
+    Args:
+        location_text: Place, city, or region name, e.g. "Paris".
+        runtime: Injected ToolRuntime with state.
+    """
+    spec: dict[str, Any] = {"kind": "location_within", "location_text": location_text}
+    try:
+        f = from_spec(spec)
+    except (UnknownFilterKindError, InvalidFilterSpecError) as exc:
+        return str(exc)
+    except Exception as exc:
+        return str(exc)
+    if not f.is_live:
+        return "Filter 'location_within' is not implemented"
+    current = list(runtime.state.get("filters", [])) if runtime and runtime.state else []
+    next_list = current + [f]
+    return Command(
+        update={
+            "filters": next_list,
+            "messages": [
+                ToolMessage("Success", tool_call_id=runtime.tool_call_id if runtime else "unknown")
+            ],
+        }
+    )
+
+
+@tool
+def add_location_near_filter(
+    location_text: str,
+    weight: float = 1.0,
+    runtime: ToolRuntime = None,
+) -> str | Command:
+    """Add a location near rank filter. Ranks images by proximity to a target location.
+
+    Args:
+        location_text: Place, address, or landmark name, e.g. "Eiffel Tower".
+        weight: Rank weight (default 1.0).
+        runtime: Injected ToolRuntime with state.
+    """
+    spec: dict[str, Any] = {"kind": "location_near", "location_text": location_text, "weight": weight}
+    try:
+        f = from_spec(spec)
+    except (UnknownFilterKindError, InvalidFilterSpecError) as exc:
+        return str(exc)
+    except Exception as exc:
+        return str(exc)
+    if not f.is_live:
+        return "Filter 'location_near' is not implemented"
+    current = list(runtime.state.get("filters", [])) if runtime and runtime.state else []
+    next_list = current + [f]
+    return Command(
+        update={
+            "filters": next_list,
+            "messages": [
+                ToolMessage("Success", tool_call_id=runtime.tool_call_id if runtime else "unknown")
+            ],
+        }
+    )
+
+
+@tool
 def reset_filters(runtime: ToolRuntime = None) -> Command:
     """Reset Agent Filter State to empty list."""
     return Command(
@@ -112,4 +178,11 @@ def get_specs(runtime: ToolRuntime = None) -> list[dict[str, Any]]:
     return [f.to_spec() for f in filters]
 
 
-TOOLS = [add_clip_filter, add_datetime_filter, reset_filters, get_specs]
+TOOLS = [
+    add_clip_filter,
+    add_datetime_filter,
+    add_location_within_filter,
+    add_location_near_filter,
+    reset_filters,
+    get_specs,
+]

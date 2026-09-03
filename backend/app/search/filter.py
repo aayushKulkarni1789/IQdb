@@ -20,6 +20,8 @@ class FilterKind(StrEnum):
     DATETIME = "datetime"
     GEO = "geo"
     FACE = "face"
+    LOCATION_WITHIN = "location_within"
+    LOCATION_NEAR = "location_near"
 
 
 class InvalidFilterSpecError(ValueError):

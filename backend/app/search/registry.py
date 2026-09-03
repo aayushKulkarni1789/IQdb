@@ -7,6 +7,8 @@ from app.search.filters.clip import ClipRank
 from app.search.filters.datetime import DatetimeFilter
 from app.search.filters.face import FaceFilter
 from app.search.filters.geo import GeoFilter
+from app.search.filters.location_near import LocationNearRank
+from app.search.filters.location_within import LocationWithinFilter
 
 
 # Registry keyed off the FilterKind enum (design D5); the incoming spec string
@@ -16,6 +18,8 @@ REGISTRY: dict[FilterKind, type[Filter]] = {
     FilterKind.DATETIME: DatetimeFilter,
     FilterKind.GEO: GeoFilter,
     FilterKind.FACE: FaceFilter,
+    FilterKind.LOCATION_WITHIN: LocationWithinFilter,
+    FilterKind.LOCATION_NEAR: LocationNearRank,
 }
 
 
