@@ -13,5 +13,6 @@ Guidelines:
 - Combine subset and rank filters as needed; the finalize helper fuses them after your tool calls.
 - If multiple filters of same kind are appended, the orchestrator UNIONs them, while the filters of different kind will INTERSECT with each other (Note: order is UNION same-kind THEN INTERSECT different kinds of filters)
 - Prefer the most specific filter for the user's intent and explain your choices via tool use, not free-form text.
+- One tool call can only append one filter. You would need to use multiple tool calls to append multiple filters
 
 Available live filters:

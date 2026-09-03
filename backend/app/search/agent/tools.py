@@ -1,5 +1,6 @@
 from typing import Any
 
+from langchain_core.messages import ToolMessage
 from langchain_core.tools import tool
 from langgraph.prebuilt import ToolRuntime
 from langgraph.types import Command
@@ -29,7 +30,14 @@ def add_clip_filter(text: str, weight: float = 1.0, runtime: ToolRuntime = None)
         return f"Filter 'clip' is not implemented"
     current = list(runtime.state.get("filters", [])) if runtime and runtime.state else []
     next_list = current + [f]
-    return Command(update={"filters": next_list})
+    return Command(
+        update={
+            "filters": next_list,
+            "messages": [
+                ToolMessage("Success", tool_call_id=runtime.tool_call_id if runtime else "unknown")
+            ],
+        }
+    )
 
 
 @tool
@@ -74,13 +82,27 @@ def add_datetime_filter(
         return f"Filter 'datetime' is not implemented"
     current = list(runtime.state.get("filters", [])) if runtime and runtime.state else []
     next_list = current + [f]
-    return Command(update={"filters": next_list})
+    return Command(
+        update={
+            "filters": next_list,
+            "messages": [
+                ToolMessage("Success", tool_call_id=runtime.tool_call_id if runtime else "unknown")
+            ],
+        }
+    )
 
 
 @tool
 def reset_filters(runtime: ToolRuntime = None) -> Command:
     """Reset Agent Filter State to empty list."""
-    return Command(update={"filters": []})
+    return Command(
+        update={
+            "filters": [],
+            "messages": [
+                ToolMessage("Success", tool_call_id=runtime.tool_call_id if runtime else "unknown")
+            ],
+        }
+    )
 
 
 @tool

@@ -1,10 +1,20 @@
 from langchain.agents import create_agent
+from langchain.agents.middleware import wrap_model_call
 from langchain.chat_models import init_chat_model
 
 from app.core.config import settings
 from app.search.agent.context import SYSTEM_PROMPT
 from app.search.agent.state import FilterAgentState
 from app.search.agent.tools import TOOLS
+
+
+@wrap_model_call
+def _disable_parallel_tool_calls(request, handler):
+    """Middleware: disable parallel tool calls to avoid concurrent `filters` updates."""
+    # Merge with existing model_settings so factory's bind_tools receives parallel_tool_calls=False
+    return handler(
+        request.override(model_settings={**request.model_settings, "parallel_tool_calls": False})
+    )
 
 
 def build_model():
@@ -15,6 +25,7 @@ def build_model():
         base_url=settings.LLM_BASE_URL,
         api_key=settings.LLM_API_KEY,
         temperature=settings.LLM_TEMPERATURE,
+        parallel_tool_calls=False,
     )
 
 
@@ -26,6 +37,7 @@ def build_agent():
         tools=TOOLS,
         state_schema=FilterAgentState,
         system_prompt=SYSTEM_PROMPT,
+        middleware=[_disable_parallel_tool_calls],
     )
     return agent
 

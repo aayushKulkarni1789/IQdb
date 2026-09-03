@@ -10,3 +10,4 @@ repomix-output.xml
 docs/TODO.md
 .cursor/
 .opencode/
+cli/build/

@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlmodel import Session
@@ -6,6 +8,8 @@ from app.search.agent.llm import invoke as agent_invoke
 
 from app.api.deps import SessionDep
 from app.search.query import finalize as finalize_filters
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -37,6 +41,17 @@ def query_search(payload: QueryRequest, db: SessionDep):
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     filters = result.get("filters", []) if isinstance(result, dict) else []
+    # INFO log every derived filter spec in Agent Filter State (request-scoped)
+    try:
+        specs = [f.to_spec() for f in filters]
+    except Exception:
+        specs = filters
+    logger.info(
+        "v2 search agent filters user_text=%r specs=%s count=%d",
+        payload.user_text,
+        specs,
+        len(specs),
+    )
     if not filters:
         raise HTTPException(status_code=422, detail="No filters derived from query")
     count, hits = finalize_filters(db, filters, payload.top_k)
